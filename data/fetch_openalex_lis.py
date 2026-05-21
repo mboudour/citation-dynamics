@@ -57,11 +57,11 @@ def reconstruct_abstract(inverted_index: dict | None) -> str:
     return " ".join(positions[i] for i in sorted(positions))
 
 
-def fetch_page(url: str, params: dict, retries: int = MAX_RETRIES) -> dict:
+def fetch_page(url: str, params: dict, headers: dict | None = None, retries: int = MAX_RETRIES) -> dict:
     """GET a single page from the OpenAlex API with retry logic."""
     for attempt in range(retries):
         try:
-            resp = requests.get(url, params=params, timeout=30)
+            resp = requests.get(url, params=params, headers=headers or {}, timeout=30)
             if resp.status_code == 200:
                 return resp.json()
             elif resp.status_code == 429:
@@ -77,7 +77,7 @@ def fetch_page(url: str, params: dict, retries: int = MAX_RETRIES) -> dict:
     raise RuntimeError(f"Failed to fetch {url} after {retries} retries.")
 
 
-def fetch_all_works(email: str | None = None) -> list[dict]:
+def fetch_all_works(email: str | None = None, api_key: str | None = None) -> list[dict]:
     """
     Retrieve all LIS journal articles from OpenAlex using cursor-based pagination.
     Returns a list of raw work dictionaries.
@@ -100,11 +100,16 @@ def fetch_all_works(email: str | None = None) -> list[dict]:
     if email:
         params["mailto"] = email   # Polite pool — higher rate limit
 
+    # API key passed as Authorization header (never in URL/params)
+    headers = {}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+
     works = []
     page_num = 0
 
     # First request to get total count
-    data = fetch_page(base_url, params)
+    data = fetch_page(base_url, params, headers=headers)
     total = data["meta"]["count"]
     print(f"Total works to fetch: {total:,}")
 
@@ -125,7 +130,7 @@ def fetch_all_works(email: str | None = None) -> list[dict]:
 
         params["cursor"] = next_cursor
         time.sleep(SLEEP_S)
-        data = fetch_page(base_url, params)
+        data = fetch_page(base_url, params, headers=headers)
 
     print(f"Fetched {len(works):,} works in {page_num} pages.")
     return works
@@ -192,6 +197,10 @@ def main():
         "--output", default="OpenAlex_LIS_1975_2024.pkl",
         help="Output pickle filename"
     )
+    parser.add_argument(
+        "--api-key", default=None, dest="api_key",
+        help="OpenAlex API key (passed as Authorization header; never stored in output)"
+    )
     args = parser.parse_args()
 
     print("=" * 60)
@@ -199,10 +208,11 @@ def main():
     print(f"  Concept : Library and Information Science ({CONCEPT_ID})")
     print(f"  Years   : {YEAR_MIN}–{YEAR_MAX}")
     print(f"  Email   : {args.email or '(none — anonymous pool)'}")
+    print(f"  API key : {'provided (Authorization header)' if args.api_key else '(none)'}")
     print(f"  Output  : {args.output}")
     print("=" * 60)
 
-    raw = fetch_all_works(email=args.email)
+    raw = fetch_all_works(email=args.email, api_key=args.api_key)
     print("Parsing records …")
     df = parse_works(raw)
 
