@@ -89,5 +89,6 @@ shap>=0.44
 matplotlib>=3.7
 seaborn>=0.12
 pyarrow>=14.0
-dimcli>=1.0          # Dimensions.ai only — requires a valid API key
+dimcli>=1.0
+# Dimensions.ai only — requires a valid API key
 ```
