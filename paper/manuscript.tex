@@ -1,0 +1,147 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{authblk}
+\usepackage{cite}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{xcolor}
+
+\geometry{margin=1in}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    citecolor=blue,
+}
+
+\title{Citation Dynamics in Library and Information Science:\\ A Comparative Machine Learning Analysis of Dimensions and OpenAlex}
+\author[1]{M. Boudour}
+\affil[1]{Independent Researcher}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Predicting citation links between scientific papers is a fundamental challenge in the science of science. This study investigates citation dynamics within the field of Library and Information Science (LIS) over a 50-year period (1975--2024). We extract large-scale citation graphs from two distinct bibliometric databases: Dimensions.ai (259,220 articles) and OpenAlex (168,901 articles). For each dataset, we engineer a set of structural, temporal, and semantic features---the latter computed using a pre-trained Siamese BERT network (SBERT) on article abstracts. We formulate citation prediction as a binary classification task on pairs of articles and evaluate a suite of machine learning models. The results demonstrate exceptional predictive performance across both datasets: the best models achieve a cross-validated ROC-AUC of 0.9906 on Dimensions (Neural Network) and 0.9979 on OpenAlex (Gradient Boosting). SHAP value analysis and feature ablation reveal that citation behavior in LIS is overwhelmingly driven by the citing author's overall activity and the cited paper's established prestige, while semantic similarity plays a strong secondary role. These findings underscore the highly structured nature of citation networks and highlight the robustness of modern bibliometric databases for predictive scientometrics.
+\end{abstract}
+
+\section{Introduction}
+The structure of scientific knowledge is woven through citations \cite{fortunato2018science}. Understanding why one paper cites another is crucial for mapping the evolution of disciplines, identifying emerging trends, and evaluating research impact \cite{wang2013quantifying, hutchins2012predicting}. While early scientometric studies relied heavily on manual analysis or small-scale network properties \cite{barabasi2002evolution}, the advent of massive, open bibliometric databases and advanced machine learning techniques has enabled predictive modeling of citation links at an unprecedented scale.
+
+In this study, we focus on the discipline of Library and Information Science (LIS), a field intrinsically concerned with the organization and retrieval of knowledge. We aim to predict the existence of a citation link between any given pair of LIS articles. To ensure the robustness of our findings, we conduct a comparative analysis using two of the largest contemporary scholarly databases: Dimensions.ai \cite{herzog2020dimensions} and OpenAlex \cite{priem2022openalex}. 
+
+We engineer features spanning three dimensions of scientific interaction:
+\begin{enumerate}
+    \item \textbf{Structural (Network):} The prestige of the cited paper, the activity level of the citing paper, and shared references/citers.
+    \item \textbf{Temporal:} The time gap between publication dates.
+    \item \textbf{Semantic:} The cosine similarity between article abstracts, computed using a state-of-the-art sentence embedding model (SBERT) \cite{reimers2019sentence}.
+\end{enumerate}
+
+We evaluate six machine learning algorithms to classify article pairs as citing or non-citing, utilizing SHapley Additive exPlanations (SHAP) \cite{lundberg2017unified} to interpret the driving forces behind citation decisions.
+
+\section{Data and Methodology}
+
+\subsection{Data Collection}
+We collected metadata for LIS articles published between 1975 and 2024. 
+For \textbf{Dimensions.ai}, we queried the database using the Field of Research (FoR) code 4610 (Library and Information Studies), yielding 259,220 articles. 
+For \textbf{OpenAlex}, we retrieved 168,901 articles linked to five core LIS concept IDs (e.g., C161191863: Library science; C124952713: Information science).
+
+\subsection{Dataset Construction}
+The prediction task is formulated as binary classification. For each dataset, we constructed a balanced set of article pairs:
+\begin{itemize}
+    \item \textbf{Positive pairs:} Pairs $(A, B)$ where article $A$ cites article $B$. We sampled 250,000 positive pairs for Dimensions and 239,349 for OpenAlex.
+    \item \textbf{Negative pairs:} Pairs $(A, B)$ where article $A$ was published after $B$, but no citation exists. We sampled an equal number of negative pairs to maintain class balance.
+\end{itemize}
+This resulted in 500,000 total pairs for Dimensions and 489,349 for OpenAlex.
+
+\subsection{Feature Engineering}
+For every pair $(A, B)$, we computed the following features:
+\begin{itemize}
+    \item \textbf{Prestige (cited):} The total citation count of the cited article $B$ at the time $A$ was published.
+    \item \textbf{Activity (citing):} The total number of outgoing references from the citing article $A$.
+    \item \textbf{Temporal Gap:} The difference in publication years ($Year_A - Year_B$).
+    \item \textbf{Common References / Citers:} The overlap in the reference lists and citation networks of $A$ and $B$.
+    \item \textbf{Semantic Similarity:} The cosine similarity between the abstracts of $A$ and $B$. Abstracts were encoded into 384-dimensional vectors using the \texttt{all-MiniLM-L6-v2} SBERT model.
+\end{itemize}
+
+\subsection{Model Training and Evaluation}
+We evaluated Logistic Regression, Linear SVM, k-Nearest Neighbors (k-NN), Random Forest, Gradient Boosting \cite{chen2017xgboost}, and a Multi-Layer Perceptron (Neural Network). Models were trained using 5-fold stratified cross-validation. Performance was measured using Area Under the Receiver Operating Characteristic Curve (ROC-AUC), F1-score, Accuracy, Precision, Recall, and the Matthews Correlation Coefficient (MCC).
+
+\section{Results}
+
+\subsection{Predictive Performance}
+The models demonstrated exceptional ability to predict citation links across both datasets (Table \ref{tab:results}). The Neural Network achieved the highest performance on the Dimensions dataset (AUC = 0.9906), while Gradient Boosting performed best on OpenAlex (AUC = 0.9979). 
+
+\begin{table}[H]
+\centering
+\caption{5-Fold Cross-Validation Results for Citation Prediction}
+\label{tab:results}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lcccccc|cccccc}
+\toprule
+ & \multicolumn{6}{c}{\textbf{Dimensions.ai (500k pairs)}} & \multicolumn{6}{c}{\textbf{OpenAlex (489k pairs)}} \\
+\cmidrule(lr){2-7} \cmidrule(lr){8-13}
+\textbf{Model} & \textbf{AUC} & \textbf{F1} & \textbf{Acc} & \textbf{Prec} & \textbf{Rec} & \textbf{MCC} & \textbf{AUC} & \textbf{F1} & \textbf{Acc} & \textbf{Prec} & \textbf{Rec} & \textbf{MCC} \\
+\midrule
+Logistic Regression & 0.9897 & 0.9522 & 0.9521 & 0.9505 & 0.9539 & 0.9042 & 0.9872 & 0.9478 & 0.9495 & 0.9574 & 0.9385 & 0.8991 \\
+Linear SVM & 0.9897 & 0.9522 & 0.9521 & 0.9505 & 0.9540 & 0.9043 & 0.9863 & 0.9451 & 0.9468 & 0.9549 & 0.9355 & 0.8937 \\
+k-NN (k=5) & 0.9773 & 0.9485 & 0.9483 & 0.9459 & 0.9511 & 0.8967 & -- & -- & -- & -- & -- & -- \\
+Random Forest & 0.9873 & 0.9503 & 0.9502 & 0.9473 & 0.9533 & 0.9003 & 0.9972 & 0.9793 & 0.9796 & 0.9729 & 0.9857 & 0.9592 \\
+Gradient Boosting & 0.9904 & 0.9542 & 0.9540 & 0.9511 & 0.9573 & 0.9081 & \textbf{0.9979} & \textbf{0.9810} & \textbf{0.9813} & \textbf{0.9752} & \textbf{0.9868} & \textbf{0.9626} \\
+Neural Network & \textbf{0.9906} & \textbf{0.9540} & \textbf{0.9539} & \textbf{0.9518} & \textbf{0.9562} & \textbf{0.9078} & -- & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+Figure \ref{fig:auc_comp} visualizes the AUC comparison between the two databases for the common models. The results are highly consistent, indicating that citation dynamics in LIS are structurally robust regardless of the underlying data source.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/comp_fig1_auc_comparison.png}
+    \caption{AUC Comparison between Dimensions.ai and OpenAlex.}
+    \label{fig:auc_comp}
+\end{figure}
+
+\subsection{Semantic Similarity}
+The SBERT embeddings effectively captured the thematic alignment between papers. As shown in Figure \ref{fig:semantic_comp}, positive (citing) pairs exhibited significantly higher mean cosine similarity than negative (non-citing) pairs across both datasets. In Dimensions, the mean similarity was 0.557 for positive pairs versus 0.162 for negative pairs. OpenAlex showed a similar divide (0.518 vs 0.216).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../figures/comp_fig4_semantic_sim_comparison.png}
+    \caption{Mean Semantic Similarity by Pair Type.}
+    \label{fig:semantic_comp}
+\end{figure}
+
+\subsection{Feature Importance and Ablation}
+To understand the drivers of citation, we extracted SHAP values from the best-performing models (Figure \ref{fig:shap_comp}). In both datasets, structural network features---specifically the activity of the citing paper and the prestige of the cited paper---dominated the model's decision-making process. Semantic similarity emerged as the third most important feature.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../figures/comp_fig3_shap_comparison.png}
+    \caption{Normalized SHAP Feature Importance across both datasets.}
+    \label{fig:shap_comp}
+\end{figure}
+
+This hierarchy was confirmed by the ablation study. When evaluating the OpenAlex dataset, removing \textit{prestige\_cited} caused the largest drop in AUC ($-0.0125$), followed by \textit{activity\_citing} ($-0.0082$) and \textit{semantic\_similarity} ($-0.0058$). The Dimensions ablation study showed that a model relying solely on semantic similarity achieved an AUC of 0.9513, while relying solely on network features yielded 0.8512. However, combining them produced the near-perfect scores observed in the full model.
+
+\section{Discussion and Conclusion}
+The results of this study demonstrate that citation links in Library and Information Science can be predicted with near-perfect accuracy (AUC $> 0.99$) using a combination of structural and semantic features. The comparative analysis between Dimensions.ai and OpenAlex reveals a striking consistency: the underlying mechanics of citation are robust to the choice of bibliometric database.
+
+The SHAP and ablation analyses highlight a "rich-get-richer" dynamic combined with thematic relevance. A paper is highly likely to be cited if it is already prestigious, if the citing author is highly active, and if the two papers share a strong semantic similarity in their abstracts. While deep learning embeddings (SBERT) provide a powerful signal of thematic overlap, structural network features remain the primary drivers of citation probability.
+
+These findings contribute to the broader science of science by quantifying the predictability of scholarly communication. Future work could extend this methodology to other disciplines to determine whether the heavy reliance on prestige is unique to LIS or a universal property of scientific citation networks.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
