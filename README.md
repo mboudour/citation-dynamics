@@ -71,7 +71,31 @@ Best model: **Multi-Layer Perceptron (MLP) Neural Network**, AUC = **0.9906**
 | Gradient Boosting | 0.9904 | 0.9542 | 0.9540 | 0.9511 | 0.9573 | 0.9081 |
 | **MLP Neural Network** | **0.9906** | **0.9540** | **0.9539** | **0.9518** | **0.9562** | **0.9078** |
 
-OpenAlex replication results will be added upon completion of the comparative pipeline.
+## Results (OpenAlex)
+
+Best model: **Gradient Boosting**, AUC = **0.9979**
+
+| Model | AUC | F1 | Accuracy | Precision | Recall | MCC |
+|---|---|---|---|---|---|---------|
+| Logistic Regression | 0.9872 | 0.9478 | 0.9495 | 0.9574 | 0.9385 | 0.8991 |
+| Linear SVM | 0.9863 | 0.9451 | 0.9468 | 0.9549 | 0.9355 | 0.8937 |
+| Random Forest | 0.9972 | 0.9793 | 0.9796 | 0.9729 | 0.9857 | 0.9592 |
+| **Gradient Boosting** | **0.9979** | **0.9810** | **0.9813** | **0.9752** | **0.9868** | **0.9626** |
+
+All results are 5-fold stratified cross-validation on 489,349 pairs (239,349 positive + 250,000 negative). k-NN and Neural Network were excluded from the OpenAlex run due to memory constraints on the 489k-pair dataset; the four models above are directly comparable with the Dimensions results.
+
+**Feature ablation (Random Forest, leave-one-out AUC):**
+
+| Feature removed | AUC | Drop |
+|---|---|---|
+| None (all features) | 0.9972 | — |
+| prestige\_cited | 0.9847 | −0.0125 |
+| activity\_citing | 0.9890 | −0.0082 |
+| semantic\_similarity | 0.9914 | −0.0058 |
+| temporal\_gap | 0.9960 | −0.0012 |
+| common\_citers | 0.9970 | −0.0002 |
+| jaccard\_refs | 0.9972 | 0.0000 |
+| common\_refs | 0.9972 | 0.0000 |
 
 ---
 
