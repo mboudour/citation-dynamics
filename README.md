@@ -130,3 +130,11 @@ pyarrow>=14.0
 dimcli>=1.0
 # Dimensions.ai only — requires a valid API key
 ```
+
+---
+
+## Copyright
+
+© 2026 Moses A. Boudourides & Giannis Tsakonas. All rights reserved.
+
+This repository and its contents are made available for academic peer review purposes only. No part of this work may be reproduced, distributed, or used in any form without the express written permission of the authors.
