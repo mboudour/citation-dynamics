@@ -1,4 +1,74 @@
-\documentclass[11pt,a4paper]{article}
+"""
+generate_v4_tex.py
+------------------
+Generates the final v4 manuscript incorporating:
+1. Formal leakage taxonomy
+2. Top-k ranking evaluation
+3. Cut literature review (30% shorter)
+4. TF-IDF temporal limitation explicit
+5. "Temporally and topically constrained negatives"
+6. Semantic similarity sociological argument
+7. Deflated graph feature claims
+8. Options A+B organizing identity
+9. Removed all over-reaching sociology language
+"""
+
+import json
+from pathlib import Path
+
+# Load all results
+RESULTS_DIR = Path("/home/ubuntu/lis_git_repo/results/v2")
+
+def load_json(path):
+    with open(path) as f:
+        return json.load(f)
+
+# Dimensions
+dim_cv = load_json(RESULTS_DIR / "dim/dim_cv_v3.json")
+dim_shap = load_json(RESULTS_DIR / "dim/dim_shap_v3.json")
+dim_ablation = load_json(RESULTS_DIR / "dim/dim_ablation_v3.json")
+dim_rolling = load_json(RESULTS_DIR / "dim/dim_rolling_v3.json")
+dim_cal = load_json(RESULTS_DIR / "dim/dim_calibration_v3.json")
+dim_mcn = load_json(RESULTS_DIR / "dim/dim_mcnemar_v3.json")
+dim_rank = load_json(RESULTS_DIR / "dim/dim_ranking_v3.json")
+
+# OpenAlex
+oa_cv = load_json(RESULTS_DIR / "oa/oa_cv_v3.json")
+oa_shap = load_json(RESULTS_DIR / "oa/oa_shap_v3.json")
+oa_ablation = load_json(RESULTS_DIR / "oa/oa_ablation_v3.json")
+oa_rolling = load_json(RESULTS_DIR / "oa/oa_rolling_v3.json")
+oa_cal = load_json(RESULTS_DIR / "oa/oa_calibration_v3.json")
+oa_mcn = load_json(RESULTS_DIR / "oa/oa_mcnemar_v3.json")
+oa_sem = load_json(RESULTS_DIR / "oa/oa_semantic_ablation_v3.json")
+oa_rank = load_json(RESULTS_DIR / "oa/oa_ranking_v3.json")
+
+# Formatting helpers
+def esc(s):
+    return s.replace("_", "\\_")
+
+gb_dim = dim_cv["Gradient Boosting"]
+gb_oa = oa_cv["Gradient Boosting"]
+
+shap_dim_sorted = sorted(dim_shap.items(), key=lambda x: -x[1])
+shap_oa_sorted = sorted(oa_shap.items(), key=lambda x: -x[1])
+
+dim_abl_sorted = []
+dim_baseline = dim_ablation.pop("baseline_auc", None)
+for k, v in sorted(dim_ablation.items(), key=lambda x: -x[1].get("auc_drop", 0)):
+    dim_abl_sorted.append((k, v["auc_drop"]))
+
+oa_abl_sorted = []
+oa_baseline = oa_ablation.pop("baseline_auc", None)
+for k, v in sorted(oa_ablation.items(), key=lambda x: -x[1].get("auc_drop", 0)):
+    oa_abl_sorted.append((k, v["auc_drop"]))
+
+TEX_PATH = Path("/home/ubuntu/lis_git_repo/paper/manuscript_v5.tex")
+
+with open(TEX_PATH, "w") as f:
+    def W(text):
+        f.write(text + "\n")
+
+    W(r"""\documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -237,4 +307,6 @@ This study introduces a strictly leakage-free methodological framework for citat
 \bibliography{references}
 
 \end{document}
+""")
 
+print("v4 manuscript generated.")

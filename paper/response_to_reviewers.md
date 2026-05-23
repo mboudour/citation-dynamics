@@ -130,5 +130,5 @@ We thank the reviewer for their thorough and constructive feedback. The manuscri
 **Resolution:** The paper was given a single, explicit organizing identity: a methodology paper introducing a leakage-free evaluation framework. The title, abstract, and introduction were all rewritten to anchor around this claim.
 
 **Quotation (Title and Section 1, lines 39–41):**
-> **Title:** "Temporally-Aware Citation Link Prediction in Library and Information Science: A Leakage-Free Methodological Framework"
+> **Title:** "Temporally-Aware Citation Link Prediction in Library and Information Science"
 > **Introduction:** "In this paper, our primary contribution is methodological: we introduce a strictly leakage-free framework for evaluating citation link prediction. We define a formal taxonomy of temporal leakage and engineer a feature set... that is strictly capped prior to the citing paper's publication year."
