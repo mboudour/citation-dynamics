@@ -59,9 +59,7 @@ W(r"""\documentclass[12pt,a4paper]{article}
 \geometry{a4paper, top=1in, bottom=1in, left=1.2in, right=1.2in}
 \setstretch{1.2}
 
-\title{\textbf{Predicting Citation Links in Library and Information Science:\\
-A Temporally-Aware Machine Learning Framework\\
-with Network, Bibliometric, and Semantic Features}}
+\title{\textbf{Temporally-Aware Citation Link Prediction in Library and Information Science}}
 
 \author[1]{Moses Boudourides}
 \author[2]{Giannis Tsakonas}
@@ -104,7 +102,7 @@ overlap), semantic proximity (TF-IDF cosine similarity), and bibliometric metada
 ROC-AUC of """ + f4(dim_cv['Gradient Boosting']['mean']['auc']) + r""" $\pm$ """ + f4(dim_cv['Gradient Boosting']['std']['auc']) + r""" (Dimensions) and """ + f4(oa_cv['Gradient Boosting']['mean']['auc']) + r""" $\pm$ """ + f4(oa_cv['Gradient Boosting']['std']['auc']) + r""" (OpenAlex) under 5-fold stratified cross-validation, with Brier scores of """ + f4(dim_cal['brier_score']) + r""" and """ + f4(oa_cal['brier_score']) + r""" respectively, confirming well-calibrated probability estimates. McNemar's test confirms statistical superiority of Gradient Boosting over Random Forest ($p < 10^{-13}$ for both datasets). Rolling temporal evaluation across four independent test windows confirms stable performance over two decades.
 
 A dedicated semantic ablation experiment reveals that semantic proximity is the
-dominant single-feature predictor in OpenAlex (AUC drop of """ + f4(oa_sem['semantic_contribution']) + r""" when removed), while temporal gap and co-citation overlap dominate in the purely structural Dimensions setting. We discuss the epistemological implications of these findings, arguing that the high predictability of citations reflects the bounded, paradigmatic nature of knowledge diffusion within established disciplinary communities rather than a trivial methodological artifact.
+dominant single-feature predictor in OpenAlex (AUC drop of """ + f4(oa_sem['semantic_contribution']) + r""" when removed), while temporal gap and co-citation overlap dominate in the purely structural Dimensions setting. We discuss the epistemological implications of these findings, suggesting that the high predictability of citations may reflect the bounded, paradigmatic nature of knowledge diffusion within established disciplinary communities, offering a plausible explanatory reading of the empirical results.
 \end{abstract}
 
 \newpage
@@ -1076,9 +1074,23 @@ W(r"""\bottomrule
 The OpenAlex models consistently outperform their Dimensions counterparts. This
 performance gap is attributable to two factors. First, the OpenAlex feature set
 includes semantic similarity, which is the strongest single predictor in that
-dataset. Second, the OpenAlex hard negatives are drawn from a tighter topical
-neighborhood (primary topic rather than broad FoR code), which may make the task
-slightly easier by reducing the diversity of negative examples.
+dataset (AUC drop of 0.0269 when removed). Second, the OpenAlex hard negatives
+are drawn from a tighter topical neighborhood (primary topic rather than broad
+FoR code), which may make the task slightly easier by reducing the diversity of
+negative examples.
+
+It is important to acknowledge the inherent asymmetry in the cross-dataset
+comparison. The two datasets differ not only in their article populations but also
+in their available feature spaces: Dimensions provides structured author and journal
+metadata that OpenAlex does not expose in the same form, while OpenAlex's abstract
+coverage enables semantic feature computation. This means the comparison is
+informative but not strictly controlled. The consistent finding that Gradient
+Boosting outperforms all baselines in both settings---despite these structural
+differences---strengthens confidence in the methodological framework rather than
+in any specific feature combination. Researchers wishing to replicate these results
+should be aware that the feature sets are tailored to the available metadata in
+each database, and that a truly controlled comparison would require harmonizing
+the feature spaces across datasets, which we leave for future work.
 
 \subsection{Feature Importance Hierarchy}
 
@@ -1116,21 +1128,24 @@ We argue that high citation predictability is not a trivial finding, nor is it
 merely a methodological artifact of the balanced binary classification setting.
 Rather, it reflects a fundamental property of knowledge diffusion within established
 scientific disciplines: citations are not random acts of intellectual acknowledgment
-but are \textit{structurally determined} by the position of papers in the existing
+but are \textit{strongly shaped} by the position of papers in the existing
 knowledge network. A paper is likely to be cited if it is highly visible (high
 prestige and PageRank), if it is topically relevant to the citing paper (high
 semantic similarity), if it is intellectually proximate (shared references,
 co-citation overlap), and if it is temporally accessible (moderate age, recent
 citation momentum).
 
-This structural determinism connects to Kuhn's concept of normal science
+This structural patterning connects to Kuhn's concept of normal science
 \citep{kuhn1962structure}: within an established paradigm, the range of relevant
 prior work is bounded by the shared assumptions and methods of the community.
 Researchers working within a paradigm do not search the entire literature; they
 search within the intellectual neighborhood defined by their research program.
 This bounded search process is precisely what our features capture, and it is why
 citations are so predictable. The high AUC values we observe are, in this reading,
-a quantitative signature of paradigmatic closure.
+consistent with the hypothesis of paradigmatic closure: they suggest that
+citation behavior in LIS is substantially constrained by disciplinary structure,
+though we acknowledge that this interpretation goes beyond what the empirical
+evidence alone can establish.
 
 This interpretation is reinforced by the dominance of prestige as a predictor.
 Merton's Matthew Effect \citep{merton1968matthew} describes a positive feedback
@@ -1225,10 +1240,21 @@ temporal gap is mitigated when the cited paper has high in-degree velocity.
 \subsection{Limitations}
 
 Despite the robustness of our findings, our study has several limitations. First,
-our analysis is restricted to Library and Information Science. The relative
-importance of social, semantic, and prestige factors may vary substantially across
-other disciplines, particularly the natural sciences, where citation practices
-differ significantly. Second, while we substantially mitigate temporal leakage by
+our analysis is restricted to Library and Information Science. Whether LIS is
+unusually predictable relative to other disciplines---or whether the high AUC values
+obtained here would replicate in, say, physics or computer science---remains an open
+and important question. LIS is a mature, relatively small, and highly self-referential
+field, which may make its citation dynamics more predictable than those of larger,
+more heterogeneous disciplines such as physics or biomedical research. Conversely,
+the interdisciplinary nature of LIS---spanning information retrieval, knowledge
+organization, and scholarly communication---introduces heterogeneity that might
+be expected to reduce predictability. We are currently conducting a cross-discipline
+comparison experiment using Physics and Computer Science corpora from OpenAlex
+(approximately 24,000 articles each, 2000--2020) to directly address this question;
+preliminary results will be reported in a forthcoming companion paper. The
+methodological framework introduced here---temporally-aware feature engineering,
+hard negative sampling, and rolling temporal evaluation---is fully transferable to
+any bibliographic corpus and is not specific to LIS. Second, while we substantially mitigate temporal leakage by
 capping all features prior to the citing paper's publication year, observational
 data cannot definitively establish causal mechanisms. Third, the OpenAlex dataset
 has relatively low abstract coverage (64.3\%), which may introduce selection bias
@@ -1261,10 +1287,11 @@ relevance is an independent driver of citation behavior; (v) graph-theoretic fea
 (PageRank, in-degree velocity) contribute meaningfully beyond raw citation counts.
 
 Theoretically, we argue that high citation predictability reflects the bounded,
-paradigmatic nature of knowledge diffusion within established disciplinary
-communities: citations are structurally determined by a paper's position in the
+bounded, paradigmatic nature of knowledge diffusion within established disciplinary
+communities, a plausible reading that connects our empirical findings to broader
+theories of scientific attention. In this view, citations are strongly shaped by a paper's position in the
 existing knowledge network, its topical relevance, and its temporal momentum.
-This structural determinism has important implications for research evaluation,
+This structural patterning has important implications for research evaluation,
 suggesting that citation-based metrics capture structural advantage as much as
 intellectual merit, and motivating the development of expected-citation baselines
 that account for the predictable components of citation behavior.
