@@ -1,0 +1,13 @@
+{
+  "method": "TF-IDF cosine similarity",
+  "n_articles_encoded": 133518,
+  "n_pairs": 478698,
+  "tfidf_max_features": 50000,
+  "tfidf_ngram_range": [
+    1,
+    2
+  ],
+  "missing_embeddings": 0,
+  "sim_mean": 0.0491556918861721,
+  "sim_std": 0.05967022679792772
+}

@@ -1,0 +1,16 @@
+{
+  "features": [
+    "prestige_cited",
+    "temporal_gap",
+    "common_refs",
+    "jaccard_refs",
+    "common_citers"
+  ],
+  "mean_abs_shap": [
+    1.3437694611410158,
+    0.7606992205601455,
+    0.1857830651149958,
+    0.30709324246943714,
+    0.5410810146864586
+  ]
+}

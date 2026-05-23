@@ -1,0 +1,20 @@
+{
+  "features": [
+    "prestige_cited",
+    "activity_citing",
+    "temporal_gap",
+    "common_refs",
+    "jaccard_refs",
+    "common_citers",
+    "semantic_similarity"
+  ],
+  "mean_abs_shap": [
+    1.826920664054817,
+    0.011613450312635708,
+    0.5226337028159205,
+    0.06099069755614754,
+    0.7101071452997765,
+    0.7261437022715246,
+    1.2063289945989806
+  ]
+}

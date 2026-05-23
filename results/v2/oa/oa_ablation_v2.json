@@ -1,0 +1,10 @@
+{
+  "all_features": 0.9566905127956955,
+  "without_prestige_cited": 0.8859685390486034,
+  "without_activity_citing": 0.9565821541955349,
+  "without_temporal_gap": 0.94456208380207,
+  "without_common_refs": 0.9566572892408363,
+  "without_jaccard_refs": 0.9565766066944466,
+  "without_common_citers": 0.9513792410816254,
+  "without_semantic_similarity": 0.9446171370349032
+}
