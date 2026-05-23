@@ -1,0 +1,11 @@
+{
+  "prestige_cited": 1.4615340664311292,
+  "semantic_similarity": 1.213900267517669,
+  "common_citers": 0.6833399530050253,
+  "jaccard_refs": 0.636994461513991,
+  "indegree_velocity": 0.5593135234840182,
+  "pagerank_cited": 0.37256915893965953,
+  "temporal_gap": 0.3507937910190938,
+  "common_refs": 0.08614829473083065,
+  "activity_citing": 0.01396334825656088
+}

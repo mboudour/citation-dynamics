@@ -1,0 +1,39 @@
+{
+  "baseline_auc": 0.8945235113312767,
+  "prestige_cited": {
+    "auc_without": 0.888449018215089,
+    "auc_drop": 0.006074493116187685
+  },
+  "temporal_gap": {
+    "auc_without": 0.8835392773540415,
+    "auc_drop": 0.010984233977235247
+  },
+  "common_refs": {
+    "auc_without": 0.8945031781350844,
+    "auc_drop": 2.0333196192323655e-05
+  },
+  "jaccard_refs": {
+    "auc_without": 0.8942260063315756,
+    "auc_drop": 0.0002975049997011592
+  },
+  "common_citers": {
+    "auc_without": 0.88468807898645,
+    "auc_drop": 0.009835432344826756
+  },
+  "pagerank_cited": {
+    "auc_without": 0.8933162724478912,
+    "auc_drop": 0.0012072388833854752
+  },
+  "indegree_velocity": {
+    "auc_without": 0.8940619940319525,
+    "auc_drop": 0.00046151729932419894
+  },
+  "author_productivity": {
+    "auc_without": 0.8927554359194425,
+    "auc_drop": 0.0017680754118342135
+  },
+  "journal_prestige": {
+    "auc_without": 0.8908769413559522,
+    "auc_drop": 0.0036465699753245318
+  }
+}

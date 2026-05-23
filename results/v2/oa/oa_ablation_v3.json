@@ -1,0 +1,39 @@
+{
+  "baseline_auc": 0.9763026159183549,
+  "prestige_cited": {
+    "auc_without": 0.9734405206305651,
+    "auc_drop": 0.002862095287789801
+  },
+  "activity_citing": {
+    "auc_without": 0.9762003569680188,
+    "auc_drop": 0.00010225895033610932
+  },
+  "temporal_gap": {
+    "auc_without": 0.973959101993918,
+    "auc_drop": 0.0023435139244368797
+  },
+  "common_refs": {
+    "auc_without": 0.9762283761356394,
+    "auc_drop": 7.423978271547949e-05
+  },
+  "jaccard_refs": {
+    "auc_without": 0.9762401107512565,
+    "auc_drop": 6.250516709838116e-05
+  },
+  "common_citers": {
+    "auc_without": 0.9734445080140327,
+    "auc_drop": 0.0028581079043221713
+  },
+  "semantic_similarity": {
+    "auc_without": 0.9494712303071093,
+    "auc_drop": 0.02683138561124554
+  },
+  "pagerank_cited": {
+    "auc_without": 0.9744647444306692,
+    "auc_drop": 0.0018378714876856606
+  },
+  "indegree_velocity": {
+    "auc_without": 0.9761321615460715,
+    "auc_drop": 0.00017045437228335736
+  }
+}
