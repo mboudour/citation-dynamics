@@ -179,9 +179,35 @@ We define four distinct forms of temporal leakage that commonly affect citation 
 
 We constructed two independent datasets for the discipline of Library and Information Science (LIS), covering the period 1975--2024. These datasets are treated as complementary experiments rather than as a perfectly controlled comparison because their metadata availability differs fundamentally: Dimensions provides a structural-only baseline, whereas OpenAlex enables a semantic+structural framework through abstract availability.
 
-\textbf{Dimensions.} The Dimensions database \citep{hook2018dimensions} is a comprehensive, linked research information system integrating publications, citations, grants, patents, and policy documents. Its coverage is among the broadest available, and it has been shown to provide a high degree of completeness and quality in publication metadata \citep{delgado2024completeness, nguyen2022quality}. Programmatic access to the Dimensions API was facilitated via the \texttt{dimcli} Python client \citep{dimcli2021}.\footnote{One might ask why Dimensions was preferred over Scopus or Web of Science. The primary reasons are twofold: (i) superior metadata completeness and quality \citep{delgado2024completeness, nguyen2022quality}, and (ii) the availability of \texttt{dimcli}, which enables efficient programmatic querying of the Dimensions API. For key literature on bibliometrics as a tool for research evaluation, see \citet{debellis2009bibliometrics}, \citet{hicks2012bibliometrics}, and \citet{bornmann2017measuring}.} We queried the Dimensions.ai DSL for publications within the LIS Field of Research code (4610) or containing core LIS keywords in their titles or abstracts. After removing records with missing publication years or reference lists, the final dataset contained 259,220 deduplicated articles.
+\textbf{Dimensions.} The Dimensions database \citep{hook2018dimensions} is a comprehensive, linked research information system integrating publications, citations, grants, patents, and policy documents. Its coverage is among the broadest available, and it has been shown to provide a high degree of completeness and quality in publication metadata \citep{delgado2024completeness, nguyen2022quality}. Programmatic access to the Dimensions API was facilitated via the \texttt{dimcli} Python client \citep{dimcli2021}.\footnote{One might ask why Dimensions was preferred over Scopus or Web of Science. The primary reasons are twofold: (i) superior metadata completeness and quality \citep{delgado2024completeness, nguyen2022quality}, and (ii) the availability of \texttt{dimcli}, which enables efficient programmatic querying of the Dimensions API. For key literature on bibliometrics as a tool for research evaluation, see \citet{debellis2009bibliometrics}, \citet{hicks2012bibliometrics}, and \citet{bornmann2017measuring}.} We queried the Dimensions.ai DSL for publications within the LIS Field of Research code (4610) or containing core LIS keywords in their titles or abstracts, using the following query:
 
-\textbf{OpenAlex.} OpenAlex \citep{priem2022openalex} is a fully open, freely accessible index of scholarly works developed as a successor to Microsoft Academic Graph. It has been independently assessed as providing reliable coverage and metadata quality for bibliometric research \citep{delgado2024completeness, nguyen2022quality}, and its open data philosophy makes it particularly suitable for reproducible research. OpenAlex provides a rich topic taxonomy enabling fine-grained subject classification, which was used in this study to define the candidate pool of hard negatives for the OpenAlex experiment. We queried the OpenAlex API using five primary topic identifiers corresponding to core LIS domains, yielding 168,901 deduplicated articles with complete abstracts. The use of two independent data infrastructures strengthens the robustness of our findings: results consistent across Dimensions and OpenAlex are more likely to reflect genuine properties of LIS citation dynamics rather than artifacts of a specific data source.
+\begin{verbatim}
+search publications
+  where category_for.id = "4610"
+  OR title_abstract_only in
+    ["knowledge organization", "digital libraries",
+     "information literacy", "academic libraries"]
+  return publications[id+year+doi+journal+
+    references+authors+category_for]
+  limit 100000 skip 0
+\end{verbatim}
+
+After removing records with missing publication years or reference lists, the final dataset contained 259,220 deduplicated articles.
+
+\textbf{OpenAlex.} OpenAlex \citep{priem2022openalex} is a fully open, freely accessible index of scholarly works developed as a successor to Microsoft Academic Graph. It has been independently assessed as providing reliable coverage and metadata quality for bibliometric research \citep{delgado2024completeness, nguyen2022quality}, and its open data philosophy makes it particularly suitable for reproducible research. OpenAlex provides a rich topic taxonomy enabling fine-grained subject classification, which was used in this study to define the candidate pool of hard negatives for the OpenAlex experiment. We queried the OpenAlex API using five primary topic identifiers corresponding to core LIS domains:
+
+\begin{verbatim}
+GET https://api.openalex.org/works?filter=
+  primary_topic.id:T10712|T14330|T13166|T13673|T10102,
+  type:article,
+  publication_year:1975-2024
+  &select=id,doi,title,abstract_inverted_index,
+    publication_year,referenced_works,authorships,
+    primary_topic,cited_by_count
+  &per-page=200
+\end{verbatim}
+
+This yielded 168,901 deduplicated articles with complete abstracts. The use of two independent data infrastructures strengthens the robustness of our findings: results consistent across Dimensions and OpenAlex are more likely to reflect genuine properties of LIS citation dynamics rather than artifacts of a specific data source.
 
 \subsection{Temporally and Topically Constrained Negatives}
 
