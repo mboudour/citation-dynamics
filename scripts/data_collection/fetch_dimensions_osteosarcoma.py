@@ -1,25 +1,25 @@
 """
-fetch_dimensions_lis.py
------------------------
-Fetches Library and Information Science (LIS) journal articles from
-Dimensions.ai (1975–2024) using two keyword searches and saves two outputs:
+fetch_dimensions_osteosarcoma.py
+--------------------------------
+Fetches osteosarcoma/bone sarcoma journal articles from Dimensions.ai (1975–2024)
+using two keyword searches, deduplicated, and saves two outputs:
 
-  1. Dimensions_LIS_1975_2024_raw.json.gz   — raw API response (all fields)
-  2. Dimensions_LIS_1975_2024.parquet       — processed: id, year, title,
-                                              abstract, reference_ids (list of pub.* strings)
+  1. Dimensions_osteosarcoma_1975_2024_raw.json.gz   — raw API response
+  2. Dimensions_osteosarcoma_1975_2024.parquet       — processed: id, year, title,
+                                                        abstract, reference_ids
 
 Keywords (searched separately, deduplicated on merge):
-  - "information literacy"
-  - "library information science"
+  - "osteosarcoma"
+  - "bone sarcoma"
 
 Folder structure (run from data_collection_scripts/):
     Citation Dynamics/
     └── computations/
         └── data_collection/
-            ├── data/                        ← outputs saved here
+            ├── data/                              ← outputs saved here
             └── data_collection_scripts/
-                ├── Dim_key.txt              ← one line: your Dimensions API key
-                └── fetch_dimensions_lis.py  ← this script
+                ├── Dim_key.txt
+                └── fetch_dimensions_osteosarcoma.py
 
 Requirements:
     pip install dimcli pandas pyarrow
@@ -37,21 +37,18 @@ HERE     = Path(__file__).parent
 DATA_DIR = HERE.parent / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-# --- Authentication ---
-with open(HERE / "Dim_key.txt", "r") as f:
+with open(HERE / "Dim_key.txt") as f:
     api_key = f.read().strip()
 
 dimcli.login(key=api_key, endpoint="https://app.dimensions.ai/api/dsl.json")
 dsl = dimcli.Dsl()
 
-# --- Configuration ---
-KEYWORDS   = ["information literacy", "library information science"]
-YEAR_MIN   = 1975
-YEAR_MAX   = 2024
-FIELDS     = "id+year+title+abstract+reference_ids"
+KEYWORDS = ["osteosarcoma", "bone sarcoma"]
+YEAR_MIN = 1975
+YEAR_MAX = 2024
+FIELDS   = "id+year+title+abstract+reference_ids"
 
-# --- Fetch each keyword ---
-all_records = {}   # id → record dict (deduplication)
+all_records = {}
 
 for kw in KEYWORDS:
     print(f"\n[{datetime.datetime.now():%H:%M:%S}]  Fetching: \"{kw}\"", flush=True)
@@ -64,27 +61,28 @@ for kw in KEYWORDS:
         return publications[{FIELDS}]
     """)
     df = result.as_dataframe()
-    before = len(all_records)
+    added = 0
     for rec in df.to_dict(orient="records"):
         pid = rec.get("id")
         if pid and pid not in all_records:
+            try:
+                rec["abstract"] = str(rec.get("abstract") or "")
+            except Exception:
+                rec["abstract"] = ""
             all_records[pid] = rec
-    added = len(all_records) - before
-    print(f"  Fetched {len(df):,} — added {added:,} new (total unique so far: {len(all_records):,})", flush=True)
+            added += 1
+    print(f"  Fetched {len(df):,} — added {added:,} new (total unique: {len(all_records):,})", flush=True)
     time.sleep(2)
 
 print(f"\n{'='*50}")
 print(f"TOTAL UNIQUE RECORDS : {len(all_records):,}")
 
-# --- Save raw as json.gz ---
 raw_list = list(all_records.values())
-raw_path = DATA_DIR / "Dimensions_LIS_1975_2024_raw.json.gz"
+raw_path = DATA_DIR / "Dimensions_osteosarcoma_1975_2024_raw.json.gz"
 with gzip.open(raw_path, "wt", encoding="utf-8") as f:
     json.dump(raw_list, f, ensure_ascii=False, default=str)
 print(f"Saved raw     → {raw_path}  ({raw_path.stat().st_size / 1e6:.1f} MB)")
 
-# --- Build processed parquet ---
-# reference_ids comes from Dimensions as a list of plain pub.* strings
 def extract_ref_ids(raw_refs):
     if not isinstance(raw_refs, list):
         return []
@@ -99,13 +97,17 @@ processed = pd.DataFrame({
 })
 processed = processed[processed["year"] > 0].sort_values("year").reset_index(drop=True)
 
-parquet_path = DATA_DIR / "Dimensions_LIS_1975_2024.parquet"
+parquet_path = DATA_DIR / "Dimensions_osteosarcoma_1975_2024.parquet"
 processed.to_parquet(parquet_path, index=False, engine="pyarrow")
 print(f"Saved parquet → {parquet_path}  ({parquet_path.stat().st_size / 1e6:.1f} MB)")
 
 refs_nonempty = (processed["reference_ids"].apply(len) > 0).sum()
+corpus_ids    = set(processed["id"])
+internal      = processed["reference_ids"].apply(lambda refs: sum(1 for r in refs if r in corpus_ids)).sum()
+
 print(f"\nProcessed summary:")
 print(f"  Records          : {len(processed):,}")
 print(f"  Year range       : {processed['year'].min()}–{processed['year'].max()}")
 print(f"  With references  : {refs_nonempty:,} ({100*refs_nonempty/len(processed):.1f}%)")
 print(f"  With abstract    : {(processed['abstract'].str.len() > 10).sum():,}")
+print(f"  Internal edges   : {internal:,}")

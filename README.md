@@ -1,6 +1,6 @@
-# LIS Citation Dynamics
+# Citation Dynamics
 
-**Predicting Citation Links in Library and Information Science: Where Network Science Meets Machine Learning**
+**Temporally-Aware Citation Prediction Across Disciplines: A Machine Learning Framework**
 
 By Moses Boudourides
 
@@ -8,108 +8,91 @@ By Moses Boudourides
 
 ## Overview
 
-This repository contains all scripts, results, and figures for a study on citation dynamics in the Library and Information Science (LIS) literature. We apply a machine learning framework to predict whether one scientific paper will cite another, using a corpus of 259,220 peer-reviewed articles (Dimensions.ai, 1975–2024) and a replication corpus from OpenAlex (168,901 articles). A central design principle is **strict temporal causality**: all features are computed using only information available prior to the citing paper's publication year, eliminating the data leakage that affects many prior citation prediction studies.
+This repository contains all scripts and tools for a comparative study of citation dynamics across 10 thematic bibliographic datasets spanning 5 broad disciplines. We apply a temporally-aware machine learning framework to predict whether one scientific paper will cite another, using keyword-defined corpora of approximately 50,000–70,000 peer-reviewed articles each, retrieved from [Dimensions.ai](https://www.dimensions.ai) (1975–2024).
+
+A central design principle is **strict temporal causality**: all features are computed using only information available prior to the citing paper's publication year, eliminating the data leakage that affects many prior citation prediction studies.
+
+The key research question is: **do citation prediction patterns differ systematically across disciplines, and if so, which features drive those differences?**
 
 ---
 
-## Data
+## Datasets
 
-### Dimensions.ai (Primary Dataset)
+Ten thematic bibliographic datasets are retrieved from Dimensions.ai using keyword searches in title and abstract, restricted to journal articles published 1975–2024. Datasets are grouped into 5 broad disciplines:
 
-Retrieved using `scripts/data_collection/fetch_dimensions_lis.py` (requires a valid Dimensions API key and the `dimcli` library). Due to Dimensions' Terms of Service, the raw dataset is not redistributed here; researchers with Dimensions access can reproduce it exactly using the provided script.
+| Discipline | Keyword(s) | Records | With abstracts | With references |
+|---|---|---|---|---|
+| Science | dark matter | 55,338 | 53,358 (96.4%) | 50,508 (91.3%) |
+| Science | information literacy + library information science | 66,679 | 63,254 (94.9%) | 41,944 (62.9%) |
+| Engineering | fatigue crack | 57,166 | 53,787 (94.1%) | 45,730 (80.0%) |
+| Engineering | environmental engineering | 53,394 | 51,471 (96.4%) | 40,595 (76.0%) |
+| BioMed | neuroblastoma | 57,319 | 51,616 (90.1%) | 43,148 (75.3%) |
+| BioMed | osteosarcoma + bone sarcoma | 61,187 | 54,528 (89.1%) | 44,170 (72.2%) |
+| Social Science | political participation | 50,560 | 48,819 (96.6%) | 31,786 (62.9%) |
+| Social Science | welfare state | 62,625 | 54,011 (86.3%) | 38,738 (61.9%) |
+| Humanities | archaeology | 60,498 | 41,941 (69.3%) | 28,870 (47.7%) |
+| Humanities | art history | 68,288 | 59,828 (87.6%) | 29,644 (43.4%) |
 
-The script issues two types of queries for each year from 1975 to 2024:
-
-- **Query A** — Field of Research (FoR) code `4610` (Library and Information Studies), filtering for journal articles only.
-- **Query B** — Title/abstract keyword search for each of the following terms, again restricted to journal articles: `"knowledge organization"`, `"digital libraries"`, `"information literacy"`, `"academic libraries"`.
-
-Results from both query types are deduplicated on Dimensions article ID. The following fields are retrieved for each article: `id`, `year`, `date`, `title`, `authors`, `journal`, `abstract`, `times_cited`, `reference_ids`, `category_for`, `concepts`, `open_access`, `doi`.
-
-| Property | Value |
-|---|---|
-| Total articles | 259,220 |
-| Year range | 1975–2024 |
-| Abstract coverage | 96.4% |
-| Reference list coverage | 65.2% |
-| Mean citations per paper | 20.98 |
-
-### OpenAlex (Replication Dataset)
-
-Retrieved using `scripts/data_collection/fetch_openalex_lis.py`. Fully open and reproducible without any subscription.
-
-The script filters works by `primary_topic.id` using five specific OpenAlex topic IDs that correspond to core LIS and scientometrics research areas, combined with a publication year range of 1975–2024:
-
-| Topic ID | Topic Label | Works at time of retrieval |
-|---|---|---|
-| T10712 | Library Science and Information Literacy | 114,018 |
-| T14330 | Library Science and Information Systems | 98,052 |
-| T13166 | Information Science and Libraries | 55,834 |
-| T13673 | Library Science and Information | 25,971 |
-| T10102 | Scientometrics and Bibliometrics Research | 99,916 |
-
-The following fields are retrieved for each article: `id`, `doi`, `title`, `abstract_inverted_index`, `authorships`, `publication_year`, `primary_location`, `open_access`, `referenced_works`, `cited_by_count`.
-
-| Property | Value |
-|---|---|
-| Total articles | 168,901 |
-| Year range | 1975–2024 |
-| Abstract coverage | 64.3% |
-| Reference list coverage | 29.8% |
+For each dataset, two files are saved to `computations/data_collection/data/`:
+1. `Dimensions_{name}_1975_2024_raw.json.gz` — complete raw API response
+2. `Dimensions_{name}_1975_2024.parquet` — processed: `id`, `year`, `title`, `abstract`, `reference_ids`
 
 ---
 
-## Results (Dimensions.ai)
+## Data Collection
 
-Best model: **Multi-Layer Perceptron (MLP) Neural Network**, AUC = **0.9906**
+All datasets are fetched using `scripts/data_collection/fetch_dimensions_keywords.py`, which iterates year by year (1975–2024) for each keyword and deduplicates across keywords within the same corpus.
 
-| Model | AUC | F1 | Accuracy | Precision | Recall | MCC |
-|---|---|---|---|---|---|---|
-| Logistic Regression | 0.9897 | 0.9522 | 0.9521 | 0.9505 | 0.9539 | 0.9042 |
-| Linear SVM | 0.9897 | 0.9522 | 0.9521 | 0.9505 | 0.9540 | 0.9043 |
-| k-NN (k=5) | 0.9773 | 0.9485 | 0.9483 | 0.9459 | 0.9511 | 0.8967 |
-| Random Forest | 0.9873 | 0.9503 | 0.9502 | 0.9473 | 0.9533 | 0.9003 |
-| Gradient Boosting | 0.9904 | 0.9542 | 0.9540 | 0.9511 | 0.9573 | 0.9081 |
-| **MLP Neural Network** | **0.9906** | **0.9540** | **0.9539** | **0.9518** | **0.9562** | **0.9078** |
+**Requirements:** A valid [Dimensions.ai](https://www.dimensions.ai) API key stored in `data_collection_scripts/Dim_key.txt`.
 
-All results are 5-fold stratified cross-validation on 500,000 pairs (250,000 positive + 250,000 negative).
+```bash
+cd computations/data_collection/data_collection_scripts
+python fetch_dimensions_keywords.py
+```
 
-**Feature ablation (Logistic Regression, leave-one-out AUC):**
+Individual per-dataset scripts are also provided for selective re-fetching.
 
-| Feature removed | AUC | Drop |
-|---|---|---|
-| None (all features) | 0.9868 | — |
-| semantic\_similarity | 0.8709 | −0.0159 |
-| prestige | 0.9618 | −0.0250 |
-| temporal\_distance | 0.9576 | −0.0292 |
-| coauth\_distance | 0.9859 | −0.0009 |
-| Semantic similarity only | 0.9513 | — |
-| Network features only | 0.8512 | — |
+---
 
-## Results (OpenAlex)
+## Citation Graph Construction
 
-Best model: **Gradient Boosting**, AUC = **0.9979**
+Citation graphs are built as directed acyclic graphs (DAGs) using NetworkX and pickled to `citation_analysis_scripts/nx_citation_graphs/`:
 
-| Model | AUC | F1 | Accuracy | Precision | Recall | MCC |
-|---|---|---|---|---|---|---------|
-| Logistic Regression | 0.9872 | 0.9478 | 0.9495 | 0.9574 | 0.9385 | 0.8991 |
-| Linear SVM | 0.9863 | 0.9451 | 0.9468 | 0.9549 | 0.9355 | 0.8937 |
-| Random Forest | 0.9972 | 0.9793 | 0.9796 | 0.9729 | 0.9857 | 0.9592 |
-| **Gradient Boosting** | **0.9979** | **0.9810** | **0.9813** | **0.9752** | **0.9868** | **0.9626** |
+```bash
+cd computations/citation_analysis_scripts
+python build_citation_graphs.py
+```
 
-All results are 5-fold stratified cross-validation on 489,349 pairs (239,349 positive + 250,000 negative). k-NN and Neural Network were excluded from the OpenAlex run due to memory constraints on the 489k-pair dataset; the four models above are directly comparable with the Dimensions results.
+Each graph has:
+- **Nodes**: paper IDs present in the corpus, with `year` attribute
+- **Edges**: directed edge (citing → cited) for every internal reference, with the DAG constraint that `year(cited) < year(citing)`
 
-**Feature ablation (Random Forest, leave-one-out AUC):**
+Citation graph statistics (nodes, edges, density, weak components, citing/cited nodes, degree distributions, clustering coefficient) are computed by:
 
-| Feature removed | AUC | Drop |
-|---|---|---|
-| None (all features) | 0.9972 | — |
-| prestige\_cited | 0.9847 | −0.0125 |
-| activity\_citing | 0.9890 | −0.0082 |
-| semantic\_similarity | 0.9914 | −0.0058 |
-| temporal\_gap | 0.9960 | −0.0012 |
-| common\_citers | 0.9970 | −0.0002 |
-| jaccard\_refs | 0.9972 | 0.0000 |
-| common\_refs | 0.9972 | 0.0000 |
+```bash
+python citation_graph_stats.py
+```
+
+---
+
+## Folder Structure
+
+```
+Citation Dynamics/
+├── computations/
+│   ├── data_collection/
+│   │   ├── data/                              # raw json.gz + processed parquet files
+│   │   └── data_collection_scripts/
+│   │       ├── fetch_dimensions_keywords.py   # master fetch script (all 10 datasets)
+│   │       ├── fetch_dimensions_*.py          # individual dataset scripts
+│   │       ├── Dim_key.txt                    # Dimensions API key (not committed)
+│   │       └── OA_key.txt                     # OpenAlex API key (not committed)
+│   └── citation_analysis_scripts/
+│       ├── build_citation_graphs.py           # builds NetworkX DAGs, pickles to nx_citation_graphs/
+│       ├── citation_graph_stats.py            # computes and saves graph statistics table
+│       └── nx_citation_graphs/                # pickled NetworkX graphs (not committed)
+└── manuscript/                                # manuscript draft and figures
+```
 
 ---
 
@@ -117,18 +100,17 @@ All results are 5-fold stratified cross-validation on 489,349 pairs (239,349 pos
 
 ```
 Python 3.11
-numpy==1.26.4
+dimcli>=1.0
 pandas>=2.0
-scikit-learn>=1.3
+pyarrow>=14.0
 networkx>=3.0
-sentence-transformers==2.7.0
-torch==2.1.0
-shap>=0.44
+numpy>=1.26
+scikit-learn>=1.3
+sentence-transformers>=2.7
+torch>=2.1
 matplotlib>=3.7
 seaborn>=0.12
-pyarrow>=14.0
-dimcli>=1.0
-# Dimensions.ai only — requires a valid API key
+tabulate>=0.9
 ```
 
 ---
