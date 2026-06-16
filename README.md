@@ -39,14 +39,7 @@ Ten thematic bibliographic datasets are retrieved from Dimensions.ai using keywo
 
 All datasets are fetched using `scripts/data_collection/fetch_dimensions_keywords.py`, which iterates year by year (1975–2024) for each keyword and deduplicates across keywords within the same corpus.
 
-**Requirements:** A valid [Dimensions.ai](https://www.dimensions.ai) API key stored in `data_collection_scripts/Dim_key.txt`.
-
-```bash
-cd computations/data_collection/data_collection_scripts
-python fetch_dimensions_keywords.py
-```
-
-Individual per-dataset scripts are also provided for selective re-fetching.
+**Requirements:** A valid [Dimensions.ai](https://www.dimensions.ai) API key.
 
 ---
 
