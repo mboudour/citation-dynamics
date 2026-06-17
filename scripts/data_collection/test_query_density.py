@@ -37,7 +37,6 @@ MAX_ARTICLES = 60_000                 # stop fetching once corpus exceeds this (
 
 # ── Candidate queries to test ──────────────────────────────────────────────────
 # Format: (label, keyword_string)
-# Add as many as you like. Run overnight if needed.
 
 QUERIES = [
     # ── Replacements for environmental_engineering ──
@@ -59,6 +58,15 @@ QUERIES = [
     ("visual_culture_theory",         "visual culture theory"),
     ("baroque_art",                   "Baroque art"),
     ("impressionism_painting",        "Impressionism painting"),
+
+    # ── Replacements for political_participation ──
+    ("deliberative_democracy",        "deliberative democracy"),
+    ("electoral_turnout",             "electoral turnout"),
+    ("online_political_mobilization", "online political mobilization"),
+    ("participatory_budgeting",       "participatory budgeting"),
+    ("voting_behavior",               "voting behavior"),
+    ("civic_engagement",              "civic engagement"),
+    ("social_movements_protest",      "social movements protest"),
 ]
 
 # ── Dimensions login ───────────────────────────────────────────────────────────
@@ -70,6 +78,13 @@ dimcli.login(key=api_key, endpoint="https://app.dimensions.ai/api/dsl.json")
 dsl = dimcli.Dsl()
 
 # ── Helper ─────────────────────────────────────────────────────────────────────
+
+def safe_refs(raw):
+    """Return a list of pub.* reference IDs, guarding against NaN/None/float."""
+    if not isinstance(raw, list):
+        return []
+    return [str(x) for x in raw if isinstance(x, str) and str(x).startswith("pub.")]
+
 
 def fetch_corpus(keyword: str) -> pd.DataFrame:
     """Fetch id, year, reference_ids for a keyword query, year by year."""
@@ -104,10 +119,7 @@ def fetch_corpus(keyword: str) -> pd.DataFrame:
     df = pd.DataFrame({
         "id":            [r.get("id", "") for r in rows],
         "year":          [int(r.get("year") or 0) for r in rows],
-        "reference_ids": [
-            [str(x) for x in (r.get("reference_ids") or []) if isinstance(x, str) and str(x).startswith("pub.")]
-            for r in rows
-        ],
+        "reference_ids": [safe_refs(r.get("reference_ids")) for r in rows],
     })
     df = df[df["year"] > 0].reset_index(drop=True)
     return df
@@ -118,15 +130,12 @@ def compute_stats(df: pd.DataFrame) -> dict:
     corpus_ids = set(df["id"])
     n_articles = len(df)
 
-    # internal edges: citations where both citing and cited paper are in corpus
     internal_edges = 0
     citing_nodes   = set()
     cited_nodes    = set()
 
     for _, row in df.iterrows():
         refs = row["reference_ids"]
-        if not isinstance(refs, list):
-            continue
         internal = [r for r in refs if r in corpus_ids]
         if internal:
             citing_nodes.add(row["id"])
@@ -134,20 +143,18 @@ def compute_stats(df: pd.DataFrame) -> dict:
             internal_edges += len(internal)
 
     n_nodes_with_edges = len(citing_nodes | cited_nodes)
-    # density = edges / (n * (n-1))  [directed, no self-loops]
     n = n_articles
     density = internal_edges / (n * (n - 1)) if n > 1 else 0.0
-    # density among only nodes that participate in at least one internal edge
     n2 = n_nodes_with_edges
     density_active = internal_edges / (n2 * (n2 - 1)) if n2 > 1 else 0.0
 
     return {
-        "n_articles":          n_articles,
-        "n_internal_edges":    internal_edges,
-        "n_nodes_active":      n_nodes_with_edges,
-        "density_full":        density,
-        "density_active":      density_active,
-        "balanced_pairs":      2 * internal_edges,
+        "n_articles":       n_articles,
+        "n_internal_edges": internal_edges,
+        "n_nodes_active":   n_nodes_with_edges,
+        "density_full":     density,
+        "density_active":   density_active,
+        "balanced_pairs":   2 * internal_edges,
     }
 
 
