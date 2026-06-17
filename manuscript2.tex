@@ -328,9 +328,9 @@ Gradient Boosting consistently outperforms all competing classifiers. McNemar's 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.7\textwidth]{../results/v2/figures/dim/dim_cv_v3.png}
-\caption{Cross-validation ROC curves for the LIS dataset. Gradient Boosting achieves the highest ROC-AUC.}
-\label{fig:cv}
+\includegraphics[width=1.0\textwidth]{../figures/fig5_roc_multiplot.png}
+\caption{Cross-validation ROC curves for all four classifiers across the ten disciplinary datasets. Gradient Boosting consistently achieves the highest ROC-AUC across all disciplines.}
+\label{fig:cv_multi}
 \end{figure}
 
 \subsection{Pairwise Classification Performance: Ten-Discipline Comparison}
@@ -392,9 +392,9 @@ Performance remains comparatively stable across all temporal windows, indicating
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.7\textwidth]{../results/v2/figures/dim/dim_rolling_v3.png}
-\caption{Rolling temporal-window ROC-AUC for the LIS dataset. Performance remains stable across all four temporal windows.}
-\label{fig:rolling}
+\includegraphics[width=1.0\textwidth]{../figures/fig6_rolling_multiplot.png}
+\caption{Rolling temporal-window ROC-AUC for Gradient Boosting across the ten disciplinary datasets. Performance remains stable across all temporal windows for which sufficient data is available.}
+\label{fig:rolling_multi}
 \end{figure}
 
 \subsection{Temporal Hold-out Generalization: All Ten Disciplines}
@@ -457,41 +457,9 @@ The structural-only Dimensions framework degrades substantially as candidate com
 
 To identify the principal drivers of predictive performance, we performed leave-one-out feature ablation on the Gradient Boosting models for all ten datasets. Table~\ref{tab:ablation_lis} presents the ablation results for the LIS dataset; Figures~\ref{fig:ablation} and~\ref{fig:shap} present the ten-discipline ablation and SHAP heatmaps.
 
-\begin{table}[H]
-\centering
-\caption{Feature ablation measured as ROC-AUC decrease after feature removal (LIS dataset, Random Forest baseline).}
-\label{tab:ablation_lis}
-\begin{tabular}{lc}
-\toprule
-\textbf{Feature} & \textbf{AUC Drop} \\
-\midrule
-Semantic Similarity & 0.317 \\
-Temporal Gap & 0.014 \\
-Prestige (Cited) & 0.003 \\
-Common References & 0.001 \\
-Jaccard References & 0.001 \\
-Common Citers & 0.001 \\
-\bottomrule
-\end{tabular}
-\end{table}
+The ten-discipline ablation and SHAP analyses confirm that semantic similarity dominates the predictive signal universally. Figure~\ref{fig:ablation_all} shows the AUC drop when each feature is removed across all ten datasets. Semantic similarity dominates in every single case, with drops ranging from 0.189 (Osteosarcoma) to 0.540 (Political Participation). The second most important feature is temporal gap, which contributes meaningfully in Archaeology (drop 0.057), Fatigue Crack (drop 0.043), Osteosarcoma (drop 0.035), and Neuroblastoma (drop 0.032), reflecting the importance of citation aging effects in these disciplines. Prestige contributes most in Welfare State (drop 0.013) and Archaeology (drop 0.017). The three bibliographic coupling features (common references, Jaccard references, common citers) contribute negligibly across all ten disciplines.
 
-Semantic similarity overwhelmingly dominates the predictive signal in LIS, with an AUC drop of 0.317 upon removal. Temporal gap is the second most important feature (drop 0.014), followed by prestige (drop 0.003). The three bibliographic coupling features (common references, Jaccard references, common citers) contribute negligibly. These results suggest that, in the LIS corpus, citation prediction is primarily driven by textual content alignment, with temporal proximity providing a secondary structural signal.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.7\textwidth]{../results/v2/figures/dim/dim_ablation_v3.png}
-\caption{Feature ablation for the LIS dataset. Semantic similarity dominates predictive performance, while temporal gap and prestige provide secondary structural enrichment.}
-\label{fig:ablation_lis}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.7\textwidth]{../results/v2/figures/dim/dim_shap_v3.png}
-\caption{SHAP feature importance for the LIS dataset. Consistent with the ablation analysis, semantic similarity is the dominant contributor.}
-\label{fig:shap_lis}
-\end{figure}
-
-The ten-discipline ablation and SHAP analyses confirm and generalize this finding. Figure~\ref{fig:ablation_all} shows the AUC drop when each feature is removed across all ten datasets. Semantic similarity dominates in every single case, with drops ranging from 0.189 (Osteosarcoma) to 0.540 (Political Participation). The second most important feature is temporal gap, which contributes meaningfully in Archaeology (drop 0.057), Fatigue Crack (drop 0.043), Osteosarcoma (drop 0.035), and Neuroblastoma (drop 0.032), reflecting the importance of citation aging effects in these disciplines. Prestige contributes most in Welfare State (drop 0.013) and Archaeology (drop 0.017). The three bibliographic coupling features (common references, Jaccard references, common citers) contribute negligibly across all ten disciplines.
+To provide a detailed view of these dynamics within each discipline, Figures~\ref{fig:ablation_multi} and~\ref{fig:shap_multi} present the leave-one-out ablation drops and normalized SHAP feature importances for each dataset individually. These multiplots confirm that the dominance of semantic similarity and the secondary structural role of temporal gap and prestige hold consistently across all five broad disciplinary clusters.
 
 \begin{figure}[H]
 \centering
@@ -505,6 +473,20 @@ The ten-discipline ablation and SHAP analyses confirm and generalize this findin
 \includegraphics[width=0.85\textwidth]{../figures/fig2_shap_heatmap.png}
 \caption{Normalized SHAP feature importance across all 10 datasets. Semantic similarity accounts for 69--91\% of the total feature importance in every discipline.}
 \label{fig:shap}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{../figures/fig7_ablation_multiplot.png}
+\caption{Individual feature ablation profiles for all ten datasets, showing the absolute AUC drop when each feature is removed.}
+\label{fig:ablation_multi}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{../figures/fig8_shap_multiplot.png}
+\caption{Individual normalized SHAP feature importance profiles for all ten datasets.}
+\label{fig:shap_multi}
 \end{figure}
 
 \section{Discussion}
