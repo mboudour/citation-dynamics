@@ -45,14 +45,24 @@ def log(msg):
     print(f"{ts} {msg}", flush=True)
 
 def parse_refs(x):
-    if pd.isna(x) or str(x).strip() in ("", "nan", "None", "[]"):
+    # Already a list (parquet stores lists natively)
+    if isinstance(x, list):
+        return x
+    # Scalar NA check (safe for non-array types)
+    try:
+        if pd.isna(x):
+            return []
+    except (TypeError, ValueError):
+        pass
+    s = str(x).strip()
+    if s in ("", "nan", "None", "[]"):
         return []
     try:
-        v = ast.literal_eval(str(x))
+        v = ast.literal_eval(s)
         return v if isinstance(v, list) else []
     except Exception:
         try:
-            return json.loads(str(x))
+            return json.loads(s)
         except Exception:
             return []
 
