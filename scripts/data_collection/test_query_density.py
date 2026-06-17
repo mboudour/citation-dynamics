@@ -86,8 +86,9 @@ def fetch_corpus(keyword: str) -> pd.DataFrame:
                 where year = {year}
                 and type = "article"
                 return publications[{FIELDS}]
-            """)
+            """, verbose=False)
             df = result.as_dataframe()
+            print(f"    {year}: {len(df):,} records", flush=True)
             for rec in df.to_dict(orient="records"):
                 pid = rec.get("id")
                 if pid and pid not in all_records:
