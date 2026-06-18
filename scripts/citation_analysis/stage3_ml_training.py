@@ -49,7 +49,8 @@ DATASETS = [
 ]
 
 FEATURES = ["prestige_cited", "temporal_gap", "common_refs", 
-            "jaccard_refs", "common_citers", "directional_similarity"]
+            "jaccard_refs", "common_citers", "two_path_count", 
+            "co_citation_count", "citation_growth_rate", "directional_similarity"]
 
 def log(msg):
     ts = time.strftime("[%H:%M:%S]")

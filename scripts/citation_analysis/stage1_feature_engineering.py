@@ -196,7 +196,23 @@ def process_dataset(dataset_name):
         union_refs = len(refs_a | refs_b)
         jaccard = common_refs / union_refs if union_refs > 0 else 0.0
         common_citers = len(cited_by.get(ci, set()) & cited_by.get(cd, set()))
-        return [prestige, temporal_gap, common_refs, jaccard, common_citers]
+        
+        # New directed pair-level features
+        # φ1: Two-path count (number of papers that cite A and are cited by B)
+        # This is the intersection of papers cited by A (refs_a) and papers citing B (cited_by[cd])
+        two_path_count = len(refs_a & cited_by.get(cd, set()))
+        
+        # φ2: Co-citation count (number of papers that cite both A and B)
+        # We already have this as common_citers, but we'll rename it to co_citation_count for clarity in output
+        co_citation_count = common_citers
+        
+        # φ3: Citation growth rate of B
+        # Number of citations B received in the year prior to A's publication, minus the year before that
+        citations_y_minus_1 = get_prestige_at(cd, citing_year - 1) - get_prestige_at(cd, citing_year - 2)
+        citations_y_minus_2 = get_prestige_at(cd, citing_year - 2) - get_prestige_at(cd, citing_year - 3)
+        citation_growth_rate = citations_y_minus_1 - citations_y_minus_2
+        
+        return [prestige, temporal_gap, common_refs, jaccard, common_citers, two_path_count, co_citation_count, citation_growth_rate]
         
     all_rows = []
     for ci, cd, citing_year, cited_year in pos_pairs:
@@ -210,7 +226,7 @@ def process_dataset(dataset_name):
     rng.shuffle(all_rows)
     cols = ["citing_id", "cited_id", "citing_year", "cited_year",
             "prestige_cited", "temporal_gap", "common_refs", "jaccard_refs", 
-            "common_citers", "label"]
+            "common_citers", "two_path_count", "co_citation_count", "citation_growth_rate", "label"]
             
     pairs_df = pd.DataFrame(all_rows, columns=cols)
     out_path = OUT_DIR / f"{dataset_name}_pairs_stage1.parquet"
@@ -223,7 +239,7 @@ def process_dataset(dataset_name):
         "n_positive_pairs": int(len(pos_pairs)),
         "n_negative_pairs": int(len(neg_pairs)),
         "n_total_pairs": int(len(pairs_df)),
-        "features": ["prestige_cited", "temporal_gap", "common_refs", "jaccard_refs", "common_citers"]
+        "features": ["prestige_cited", "temporal_gap", "common_refs", "jaccard_refs", "common_citers", "two_path_count", "co_citation_count", "citation_growth_rate"]
     }
     with open(OUT_DIR / f"{dataset_name}_stats_stage1.json", "w") as f:
         json.dump(stats, f, indent=2)
