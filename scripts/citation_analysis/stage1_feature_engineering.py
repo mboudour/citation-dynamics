@@ -9,12 +9,11 @@ Methodology (from LIS manuscript):
 2. Negative pairs: hard negative sampling. We pick a non-cited paper 
    published within ±3 years of the true cited paper.
    (We avoid FoR code constraints to keep it general across all datasets).
-3. Features computed (all temporally constrained to year <= citing_year):
-   - prestige_cited (in-degree at year Y-1)
-   - temporal_gap (citing_year - cited_year)
-   - common_refs (bibliographic coupling)
-   - jaccard_refs
-   - common_citers (co-citation)
+3. Features computed (all temporally constrained to year <= citing_year - 1):
+   - temporal_indegree  : in-degree of cited paper at citing_year - 1
+   - temporal_pagerank  : PageRank of cited paper in subgraph at citing_year - 1
+   - citation_time_gap  : citing_year - cited_year
+   (directional_similarity is added in Stage 2b)
 
 Outputs:
   computations/citation_analysis_scripts/features/{dataset}_pairs_stage1.parquet
@@ -23,6 +22,7 @@ Outputs:
 import ast, bisect, json, os, time, sys
 import numpy as np
 import pandas as pd
+import networkx as nx
 from collections import defaultdict
 from pathlib import Path
 
@@ -90,23 +90,50 @@ def process_dataset(dataset_name):
     years = df["year"].values
     ids = df["id"].values
     
-    # ── Year-capped prestige ──
-    log("Building year-capped prestige index...")
-    cited_by_year = defaultdict(list)
+    # ── Build full edge list for temporal subgraph construction ──
+    log("Building edge list for temporal subgraph...")
+    # edges: list of (citing_int, cited_int, citing_year)
+    all_edges = []
     for row in df.itertuples():
         ci = id_to_int[row.id]
         for ref in row.refs:
             cd = id_to_int.get(ref)
-            if cd is not None:
-                cited_by_year[cd].append(row.year)
-                
+            if cd is not None and years[cd] < row.year:
+                all_edges.append((ci, cd, row.year))
+    
+    # Sort edges by year for efficient subgraph construction
+    all_edges.sort(key=lambda e: e[2])
+    edge_years = np.array([e[2] for e in all_edges])
+    
+    # ── Year-capped indegree index ──
+    log("Building temporal indegree index...")
+    cited_by_year = defaultdict(list)
+    for ci, cd, ey in all_edges:
+        cited_by_year[cd].append(ey)
     for pid in cited_by_year:
         cited_by_year[pid].sort()
         
-    def get_prestige_at(cd_int, max_year):
+    def get_indegree_at(cd_int, max_year):
         yrs = cited_by_year.get(cd_int, [])
         return bisect.bisect_right(yrs, max_year)
-        
+    
+    # ── Temporal PageRank: compute once per unique citing year ──
+    log("Computing temporal PageRank per unique citing year...")
+    unique_years = sorted(set(years))
+    pagerank_cache = {}  # max_year -> {node_int: pr_score}
+    
+    for max_year in unique_years:
+        # Build subgraph of all edges with citing_year <= max_year
+        hi = bisect.bisect_right(edge_years, max_year)
+        G = nx.DiGraph()
+        G.add_nodes_from(range(n))
+        for ci, cd, _ in all_edges[:hi]:
+            G.add_edge(ci, cd)
+        pr = nx.pagerank(G, alpha=0.85, max_iter=100, tol=1e-6)
+        pagerank_cache[max_year] = pr
+    
+    log(f"PageRank computed for {len(unique_years)} time points.")
+    
     # ── Positive pairs ──
     log("Building positive pairs...")
     pos_pairs = []
@@ -124,12 +151,8 @@ def process_dataset(dataset_name):
     # ── Hard negatives ──
     log("Building hard negatives (±3 years)...")
     actual_citations_int = set()
-    for row in df.itertuples():
-        ci = id_to_int[row.id]
-        for ref in row.refs:
-            cd = id_to_int.get(ref)
-            if cd is not None:
-                actual_citations_int.add(ci * n + cd)
+    for ci, cd, ey in all_edges:
+        actual_citations_int.add(ci * n + cd)
                 
     # Sort all ids by year for binary search
     sorted_indices = np.argsort(years)
@@ -176,43 +199,15 @@ def process_dataset(dataset_name):
     log(f"Balanced: {n_pairs:,} pos + {n_pairs:,} neg = {2*n_pairs:,} total")
     
     # ── Compute features ──
-    log("Computing structural features...")
-    cited_by = defaultdict(set)
-    ref_sets = {}
-    for row in df.itertuples():
-        ci = id_to_int[row.id]
-        ref_sets[ci] = {id_to_int[r] for r in row.refs if r in id_to_int}
-        for ref in row.refs:
-            cd = id_to_int.get(ref)
-            if cd is not None:
-                cited_by[cd].add(ci)
-                
+    log("Computing features...")
+    
     def compute_features(ci, cd, citing_year, cited_year):
-        prestige = get_prestige_at(cd, citing_year - 1)
-        temporal_gap = citing_year - cited_year
-        refs_a = ref_sets.get(ci, set())
-        refs_b = ref_sets.get(cd, set())
-        common_refs = len(refs_a & refs_b)
-        union_refs = len(refs_a | refs_b)
-        jaccard = common_refs / union_refs if union_refs > 0 else 0.0
-        common_citers = len(cited_by.get(ci, set()) & cited_by.get(cd, set()))
-        
-        # New directed pair-level features
-        # φ1: Two-path count (number of papers that cite A and are cited by B)
-        # This is the intersection of papers cited by A (refs_a) and papers citing B (cited_by[cd])
-        two_path_count = len(refs_a & cited_by.get(cd, set()))
-        
-        # φ2: Co-citation count (number of papers that cite both A and B)
-        # We already have this as common_citers, but we'll rename it to co_citation_count for clarity in output
-        co_citation_count = common_citers
-        
-        # φ3: Citation growth rate of B
-        # Number of citations B received in the year prior to A's publication, minus the year before that
-        citations_y_minus_1 = get_prestige_at(cd, citing_year - 1) - get_prestige_at(cd, citing_year - 2)
-        citations_y_minus_2 = get_prestige_at(cd, citing_year - 2) - get_prestige_at(cd, citing_year - 3)
-        citation_growth_rate = citations_y_minus_1 - citations_y_minus_2
-        
-        return [prestige, temporal_gap, common_refs, jaccard, common_citers, two_path_count, co_citation_count, citation_growth_rate]
+        max_year = citing_year - 1
+        temporal_indegree = get_indegree_at(cd, max_year)
+        citation_time_gap = citing_year - cited_year
+        pr_map = pagerank_cache.get(max_year, pagerank_cache.get(max(k for k in pagerank_cache if k <= max_year), {}))
+        temporal_pagerank = pr_map.get(cd, 0.0)
+        return [temporal_indegree, citation_time_gap, temporal_pagerank]
         
     all_rows = []
     for ci, cd, citing_year, cited_year in pos_pairs:
@@ -225,8 +220,7 @@ def process_dataset(dataset_name):
         
     rng.shuffle(all_rows)
     cols = ["citing_id", "cited_id", "citing_year", "cited_year",
-            "prestige_cited", "temporal_gap", "common_refs", "jaccard_refs", 
-            "common_citers", "two_path_count", "co_citation_count", "citation_growth_rate", "label"]
+            "temporal_indegree", "citation_time_gap", "temporal_pagerank", "label"]
             
     pairs_df = pd.DataFrame(all_rows, columns=cols)
     out_path = OUT_DIR / f"{dataset_name}_pairs_stage1.parquet"
@@ -239,7 +233,7 @@ def process_dataset(dataset_name):
         "n_positive_pairs": int(len(pos_pairs)),
         "n_negative_pairs": int(len(neg_pairs)),
         "n_total_pairs": int(len(pairs_df)),
-        "features": ["prestige_cited", "temporal_gap", "common_refs", "jaccard_refs", "common_citers", "two_path_count", "co_citation_count", "citation_growth_rate"]
+        "features": ["temporal_indegree", "citation_time_gap", "temporal_pagerank"]
     }
     with open(OUT_DIR / f"{dataset_name}_stats_stage1.json", "w") as f:
         json.dump(stats, f, indent=2)

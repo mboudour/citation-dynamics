@@ -48,9 +48,7 @@ DATASETS = [
     "welfare_state", "archaeology", "art_history"
 ]
 
-FEATURES = ["prestige_cited", "temporal_gap", "common_refs", 
-            "jaccard_refs", "common_citers", "two_path_count", 
-            "co_citation_count", "citation_growth_rate", "directional_similarity"]
+FEATURES = ["temporal_indegree", "citation_time_gap", "temporal_pagerank", "directional_similarity"]
 
 def log(msg):
     ts = time.strftime("[%H:%M:%S]")
