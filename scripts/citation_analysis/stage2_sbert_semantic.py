@@ -49,6 +49,12 @@ def process_dataset(dataset_name):
     log(f"Unique papers to encode: {len(all_ids):,}")
     id_to_idx = {pid: i for i, pid in enumerate(all_ids)}
     
+    # Save the id mapping so stage2b can use the exact same indexing
+    ds_ckpt_dir = CKPT_DIR / dataset_name
+    os.makedirs(ds_ckpt_dir, exist_ok=True)
+    with open(ds_ckpt_dir / "article_ids.json", "w") as f:
+        json.dump(all_ids, f)
+    
     # ── Load texts ──
     log(f"Loading texts from {data_path.name}...")
     df_raw = pd.read_parquet(data_path, columns=["id", "title", "abstract"])

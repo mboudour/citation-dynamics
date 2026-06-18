@@ -81,7 +81,13 @@ def process_dataset(dataset_name):
     log(f"Loaded {len(pairs_df):,} pairs")
     
     # ── Collect unique IDs to map to embeddings ──
-    all_ids = list(set(pairs_df["citing_id"].tolist() + pairs_df["cited_id"].tolist()))
+    ids_file = CKPT_DIR / dataset_name / "article_ids.json"
+    if not ids_file.exists():
+        log(f"ERROR: Missing {ids_file.name}. You must re-run stage 2 first to generate it.")
+        return
+        
+    with open(ids_file, "r") as f:
+        all_ids = json.load(f)
     id_to_idx = {pid: i for i, pid in enumerate(all_ids)}
     
     log("Loading embeddings...")
