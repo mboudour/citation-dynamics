@@ -49,7 +49,7 @@ DATASETS = [
 ]
 
 FEATURES = ["prestige_cited", "temporal_gap", "common_refs", 
-            "jaccard_refs", "common_citers", "semantic_similarity"]
+            "jaccard_refs", "common_citers", "directional_similarity"]
 
 def log(msg):
     ts = time.strftime("[%H:%M:%S]")
@@ -58,7 +58,7 @@ def log(msg):
 def process_dataset(dataset_name):
     log(f"\n{'='*50}\nStage 3: {dataset_name}\n{'='*50}")
     
-    data_path = FEAT_DIR / f"{dataset_name}_pairs_stage2.parquet"
+    data_path = FEAT_DIR / f"{dataset_name}_pairs_stage2b.parquet"
     if not data_path.exists():
         log(f"ERROR: {data_path.name} not found. Run Stage 2 first.")
         return
@@ -191,6 +191,43 @@ def process_dataset(dataset_name):
             json.dump(temporal_results, f, indent=2)
     else:
         log("  Skipping temporal hold-out: Insufficient data in time ranges.")
+        
+    # ── S / N / SN Model Decomposition (Gradient Boosting) ──
+    log("Running S / N / SN decomposition (Gradient Boosting 5-fold CV)...")
+    idx_S = FEATURES.index("directional_similarity")
+    idx_N = [i for i in range(len(FEATURES)) if i != idx_S]
+    
+    X_S = X[:, [idx_S]]
+    X_N = X[:, idx_N]
+    
+    decomp_results = {"S": [], "N": [], "SN": []}
+    gb_decomp = GradientBoostingClassifier(n_estimators=200, random_state=SEED)
+    
+    for tr, te in skf.split(X, y):
+        # Model S
+        sc_S = StandardScaler()
+        gb_decomp.fit(sc_S.fit_transform(X_S[tr]), y[tr])
+        decomp_results["S"].append(roc_auc_score(y[te], gb_decomp.predict_proba(sc_S.transform(X_S[te]))[:,1]))
+        
+        # Model N
+        sc_N = StandardScaler()
+        gb_decomp.fit(sc_N.fit_transform(X_N[tr]), y[tr])
+        decomp_results["N"].append(roc_auc_score(y[te], gb_decomp.predict_proba(sc_N.transform(X_N[te]))[:,1]))
+        
+        # Model SN (all features)
+        sc_SN = StandardScaler()
+        gb_decomp.fit(sc_SN.fit_transform(X[tr]), y[tr])
+        decomp_results["SN"].append(roc_auc_score(y[te], gb_decomp.predict_proba(sc_SN.transform(X[te]))[:,1]))
+        
+    decomp_summary = {
+        "AUC_S": float(np.mean(decomp_results["S"])),
+        "AUC_N": float(np.mean(decomp_results["N"])),
+        "AUC_SN": float(np.mean(decomp_results["SN"]))
+    }
+    log(f"  Decomposition AUC: S={decomp_summary['AUC_S']:.4f}, N={decomp_summary['AUC_N']:.4f}, SN={decomp_summary['AUC_SN']:.4f}")
+    
+    with open(OUT_DIR / f"{dataset_name}_decomposition.json", "w") as f:
+        json.dump(decomp_summary, f, indent=2)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
