@@ -1,0 +1,72 @@
+{
+  "dataset": "organizational_behavior",
+  "n_pairs": 266,
+  "n_positives": 133,
+  "auc": {
+    "S": {
+      "mean": 0.4806162287643769,
+      "std": 0.08533365792346477
+    },
+    "T": {
+      "mean": 0.6272765643136015,
+      "std": 0.06454287616222439
+    },
+    "N": {
+      "mean": 0.32404241848686294,
+      "std": 0.022480849954366413
+    },
+    "S+T": {
+      "mean": 0.6197847420069642,
+      "std": 0.06414332432162693
+    },
+    "S+N": {
+      "mean": 0.48611374907671207,
+      "std": 0.08261510166828648
+    },
+    "T+N": {
+      "mean": 0.591653476838662,
+      "std": 0.07459810865423401
+    },
+    "S+T+N": {
+      "mean": 0.6081354859132637,
+      "std": 0.09275764436087734
+    }
+  },
+  "deltas": {
+    "Delta_S": -0.0075,
+    "Delta_T": 0.1392,
+    "Delta_N_ST": -0.0116
+  },
+  "collinearity": {
+    "all_pairs__T_vs_temporal_indegree": {
+      "pearson": 0.3652,
+      "spearman": 0.2394,
+      "n": 266
+    },
+    "all_pairs__T_vs_temporal_pagerank": {
+      "pearson": 0.3652,
+      "spearman": 0.1309,
+      "n": 266
+    },
+    "positives__T_vs_temporal_indegree": {
+      "pearson": 0.5199,
+      "spearman": 0.3455,
+      "n": 133
+    },
+    "positives__T_vs_temporal_pagerank": {
+      "pearson": 0.5199,
+      "spearman": 0.2275,
+      "n": 133
+    },
+    "negatives__T_vs_temporal_indegree": {
+      "pearson": NaN,
+      "spearman": NaN,
+      "n": 133
+    },
+    "negatives__T_vs_temporal_pagerank": {
+      "pearson": 0.0183,
+      "spearman": 0.0391,
+      "n": 133
+    }
+  }
+}

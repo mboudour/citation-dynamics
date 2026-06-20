@@ -1,6 +1,6 @@
-# Citation Dynamics
+# Semantic Alignment, Chronological Distance, and Citation-Network Prominence in Citation Formation: Evidence from Ten Citation Corpora
 
-**Temporally-Aware Citation Prediction Across Disciplines: A Machine Learning Framework**
+ 
 
 By Moses Boudourides
 
@@ -22,18 +22,18 @@ Ten thematic bibliographic datasets are retrieved from Dimensions.ai using keywo
 
 *See `outputs/tables/table1_corpus_overview.csv` for detailed corpus construction queries and abstract availability.*
 
-| Domain | Dataset |
-|---|---|
-| Science | Protein Folding |
-| Science | CRISPR |
-| Engineering | Additive Manufacturing |
-| Engineering | Corrosion Protection |
-| BioMed | Neuroblastoma |
-| BioMed | Osteosarcoma |
-| Social Science | Income Inequality |
-| Social Science | Organizational Behavior |
-| Humanities | Film Studies |
-| Humanities | Memory Studies |
+| Domain | Dataset | Papers | Papers in internal citations | Internal citations | Density | GCC size |
+|---|---|---|---|---|---|---|
+| Science | Protein Folding | 82,428 | 73,433 (89.1%) | 889,384 | 2.62e-04 | 72,970 |
+| Science | CRISPR | 64,484 | 49,224 (76.3%) | 753,711 | 3.63e-04 | 48,937 |
+| Engineering | Additive Manufacturing | 58,541 | 48,937 (83.6%) | 575,853 | 3.36e-04 | 48,190 |
+| Engineering | Corrosion Protection | 26,486 | 18,861 (71.2%) | 125,884 | 3.59e-04 | 18,112 |
+| BioMed | Neuroblastoma | 57,319 | 44,290 (77.3%) | 326,670 | 1.99e-04 | 43,662 |
+| BioMed | Osteosarcoma | 61,187 | 46,131 (75.4%) | 389,874 | 2.08e-04 | 45,365 |
+| Social Science | Income Inequality | 40,279 | 26,974 (67.0%) | 136,433 | 1.68e-04 | 26,189 |
+| Social Science | Organizational Behavior | 75,622 | 42,269 (55.9%) | 242,381 | 8.48e-05 | 39,904 |
+| Humanities | Film Studies | 393,342 | 280,525 (71.3%) | 903,486 | 1.17e-05 | 264,167 |
+| Humanities | Memory Studies | 347,195 | 247,507 (71.3%) | 1,820,834 | 3.02e-05 | 237,708 |
 
 ---
 

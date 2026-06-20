@@ -1,0 +1,72 @@
+{
+  "dataset": "protein_folding",
+  "n_pairs": 112,
+  "n_positives": 56,
+  "auc": {
+    "S": {
+      "mean": 0.5223140495867769,
+      "std": 0.08305065550014744
+    },
+    "T": {
+      "mean": 0.8241735537190081,
+      "std": 0.1130004747840195
+    },
+    "N": {
+      "mean": 0.13312672176308538,
+      "std": 0.054730881082615604
+    },
+    "S+T": {
+      "mean": 0.7705922865013773,
+      "std": 0.10723527526185658
+    },
+    "S+N": {
+      "mean": 0.3389118457300276,
+      "std": 0.07600398194401438
+    },
+    "T+N": {
+      "mean": 0.6922865013774105,
+      "std": 0.04290285372936082
+    },
+    "S+T+N": {
+      "mean": 0.7003443526170798,
+      "std": 0.09758746602890726
+    }
+  },
+  "deltas": {
+    "Delta_S": -0.0536,
+    "Delta_T": 0.2483,
+    "Delta_N_ST": -0.0702
+  },
+  "collinearity": {
+    "all_pairs__T_vs_temporal_indegree": {
+      "pearson": 0.0085,
+      "spearman": 0.0643,
+      "n": 112
+    },
+    "all_pairs__T_vs_temporal_pagerank": {
+      "pearson": 0.0085,
+      "spearman": -0.0005,
+      "n": 112
+    },
+    "positives__T_vs_temporal_indegree": {
+      "pearson": 0.0011,
+      "spearman": 0.1571,
+      "n": 56
+    },
+    "positives__T_vs_temporal_pagerank": {
+      "pearson": 0.0012,
+      "spearman": 0.0783,
+      "n": 56
+    },
+    "negatives__T_vs_temporal_indegree": {
+      "pearson": NaN,
+      "spearman": NaN,
+      "n": 56
+    },
+    "negatives__T_vs_temporal_pagerank": {
+      "pearson": -0.0495,
+      "spearman": -0.0421,
+      "n": 56
+    }
+  }
+}

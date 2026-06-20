@@ -1,0 +1,72 @@
+{
+  "dataset": "neuroblastoma",
+  "n_pairs": 304,
+  "n_positives": 152,
+  "auc": {
+    "S": {
+      "mean": 0.5282258064516129,
+      "std": 0.06121340202399422
+    },
+    "T": {
+      "mean": 0.6436164874551972,
+      "std": 0.05788944845738179
+    },
+    "N": {
+      "mean": 0.19179928315412184,
+      "std": 0.036027616949755724
+    },
+    "S+T": {
+      "mean": 0.6248602150537634,
+      "std": 0.042159281515713076
+    },
+    "S+N": {
+      "mean": 0.49367741935483866,
+      "std": 0.06297255255141736
+    },
+    "T+N": {
+      "mean": 0.5486917562724014,
+      "std": 0.054868616953111723
+    },
+    "S+T+N": {
+      "mean": 0.6268673835125448,
+      "std": 0.030826053134159308
+    }
+  },
+  "deltas": {
+    "Delta_S": -0.0188,
+    "Delta_T": 0.0966,
+    "Delta_N_ST": 0.002
+  },
+  "collinearity": {
+    "all_pairs__T_vs_temporal_indegree": {
+      "pearson": 0.0213,
+      "spearman": 0.0634,
+      "n": 304
+    },
+    "all_pairs__T_vs_temporal_pagerank": {
+      "pearson": 0.0207,
+      "spearman": 0.0924,
+      "n": 304
+    },
+    "positives__T_vs_temporal_indegree": {
+      "pearson": 0.0279,
+      "spearman": 0.0946,
+      "n": 152
+    },
+    "positives__T_vs_temporal_pagerank": {
+      "pearson": 0.0276,
+      "spearman": 0.1822,
+      "n": 152
+    },
+    "negatives__T_vs_temporal_indegree": {
+      "pearson": NaN,
+      "spearman": NaN,
+      "n": 152
+    },
+    "negatives__T_vs_temporal_pagerank": {
+      "pearson": -0.0874,
+      "spearman": 0.0206,
+      "n": 152
+    }
+  }
+}

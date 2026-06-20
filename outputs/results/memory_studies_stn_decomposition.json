@@ -1,0 +1,72 @@
+{
+  "dataset": "memory_studies",
+  "n_pairs": 348,
+  "n_positives": 174,
+  "auc": {
+    "S": {
+      "mean": 0.4457406962785114,
+      "std": 0.06385156153019571
+    },
+    "T": {
+      "mean": 0.5773397358943578,
+      "std": 0.01394726670120523
+    },
+    "N": {
+      "mean": 0.21639855942376948,
+      "std": 0.052514627497823985
+    },
+    "S+T": {
+      "mean": 0.5493781512605042,
+      "std": 0.055110913925945255
+    },
+    "S+N": {
+      "mean": 0.47640576230492193,
+      "std": 0.05328494800618189
+    },
+    "T+N": {
+      "mean": 0.45672268907563024,
+      "std": 0.04255100779202731
+    },
+    "S+T+N": {
+      "mean": 0.5543313325330133,
+      "std": 0.048739041860936784
+    }
+  },
+  "deltas": {
+    "Delta_S": -0.028,
+    "Delta_T": 0.1036,
+    "Delta_N_ST": 0.005
+  },
+  "collinearity": {
+    "all_pairs__T_vs_temporal_indegree": {
+      "pearson": 0.0267,
+      "spearman": 0.0411,
+      "n": 348
+    },
+    "all_pairs__T_vs_temporal_pagerank": {
+      "pearson": 0.0266,
+      "spearman": -0.0615,
+      "n": 348
+    },
+    "positives__T_vs_temporal_indegree": {
+      "pearson": 0.0349,
+      "spearman": 0.0566,
+      "n": 174
+    },
+    "positives__T_vs_temporal_pagerank": {
+      "pearson": 0.0348,
+      "spearman": -0.0249,
+      "n": 174
+    },
+    "negatives__T_vs_temporal_indegree": {
+      "pearson": NaN,
+      "spearman": NaN,
+      "n": 174
+    },
+    "negatives__T_vs_temporal_pagerank": {
+      "pearson": -0.1365,
+      "spearman": -0.0945,
+      "n": 174
+    }
+  }
+}

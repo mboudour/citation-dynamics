@@ -1,0 +1,14 @@
+{
+  "features": [
+    "temporal_indegree",
+    "citation_time_gap",
+    "temporal_pagerank",
+    "directional_similarity"
+  ],
+  "mean_abs_shap": [
+    0.012576706924703432,
+    1.1561061459585826,
+    0.28290785383685507,
+    1.1818467420552403
+  ]
+}

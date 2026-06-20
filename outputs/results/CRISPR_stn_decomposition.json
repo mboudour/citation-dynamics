@@ -1,0 +1,72 @@
+{
+  "dataset": "CRISPR",
+  "n_pairs": 216,
+  "n_positives": 108,
+  "auc": {
+    "S": {
+      "mean": 0.5363341204250295,
+      "std": 0.16274474498126573
+    },
+    "T": {
+      "mean": 0.7502558048012593,
+      "std": 0.031823699986621067
+    },
+    "N": {
+      "mean": 0.365564738292011,
+      "std": 0.04998387069186918
+    },
+    "S+T": {
+      "mean": 0.7283648170011807,
+      "std": 0.06618146864474701
+    },
+    "S+N": {
+      "mean": 0.49093860684769786,
+      "std": 0.1496400076394546
+    },
+    "T+N": {
+      "mean": 0.7213892168437623,
+      "std": 0.042916504041287856
+    },
+    "S+T+N": {
+      "mean": 0.7325068870523416,
+      "std": 0.0825219615879104
+    }
+  },
+  "deltas": {
+    "Delta_S": -0.0219,
+    "Delta_T": 0.192,
+    "Delta_N_ST": 0.0041
+  },
+  "collinearity": {
+    "all_pairs__T_vs_temporal_indegree": {
+      "pearson": 0.4952,
+      "spearman": 0.2967,
+      "n": 216
+    },
+    "all_pairs__T_vs_temporal_pagerank": {
+      "pearson": 0.495,
+      "spearman": -0.2003,
+      "n": 216
+    },
+    "positives__T_vs_temporal_indegree": {
+      "pearson": 0.6886,
+      "spearman": 0.4645,
+      "n": 108
+    },
+    "positives__T_vs_temporal_pagerank": {
+      "pearson": 0.6886,
+      "spearman": 0.0518,
+      "n": 108
+    },
+    "negatives__T_vs_temporal_indegree": {
+      "pearson": NaN,
+      "spearman": NaN,
+      "n": 108
+    },
+    "negatives__T_vs_temporal_pagerank": {
+      "pearson": -0.453,
+      "spearman": -0.4677,
+      "n": 108
+    }
+  }
+}

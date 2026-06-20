@@ -1,0 +1,72 @@
+{
+  "dataset": "income_inequality",
+  "n_pairs": 172,
+  "n_positives": 86,
+  "auc": {
+    "S": {
+      "mean": 0.5822760476739716,
+      "std": 0.06292797775966831
+    },
+    "T": {
+      "mean": 0.6152441368704344,
+      "std": 0.04649625541470797
+    },
+    "N": {
+      "mean": 0.22381776239907727,
+      "std": 0.04670052350859284
+    },
+    "S+T": {
+      "mean": 0.5950019223375624,
+      "std": 0.10034008417155603
+    },
+    "S+N": {
+      "mean": 0.4920415224913495,
+      "std": 0.04129896976539284
+    },
+    "T+N": {
+      "mean": 0.5002306805074971,
+      "std": 0.0632432288504597
+    },
+    "S+T+N": {
+      "mean": 0.5331410995770858,
+      "std": 0.05961002333369048
+    }
+  },
+  "deltas": {
+    "Delta_S": -0.0202,
+    "Delta_T": 0.0127,
+    "Delta_N_ST": -0.0619
+  },
+  "collinearity": {
+    "all_pairs__T_vs_temporal_indegree": {
+      "pearson": 0.2588,
+      "spearman": 0.2109,
+      "n": 172
+    },
+    "all_pairs__T_vs_temporal_pagerank": {
+      "pearson": 0.2587,
+      "spearman": 0.027,
+      "n": 172
+    },
+    "positives__T_vs_temporal_indegree": {
+      "pearson": 0.3732,
+      "spearman": 0.3024,
+      "n": 86
+    },
+    "positives__T_vs_temporal_pagerank": {
+      "pearson": 0.3732,
+      "spearman": 0.1395,
+      "n": 86
+    },
+    "negatives__T_vs_temporal_indegree": {
+      "pearson": NaN,
+      "spearman": NaN,
+      "n": 86
+    },
+    "negatives__T_vs_temporal_pagerank": {
+      "pearson": -0.0885,
+      "spearman": -0.0866,
+      "n": 86
+    }
+  }
+}

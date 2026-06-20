@@ -1,0 +1,72 @@
+{
+  "dataset": "corrosion_protection",
+  "n_pairs": 180,
+  "n_positives": 90,
+  "auc": {
+    "S": {
+      "mean": 0.4765432098765432,
+      "std": 0.09049791141643089
+    },
+    "T": {
+      "mean": 0.620679012345679,
+      "std": 0.10509882416578374
+    },
+    "N": {
+      "mean": 0.18549382716049384,
+      "std": 0.05846627349517098
+    },
+    "S+T": {
+      "mean": 0.5901234567901235,
+      "std": 0.08836867666081877
+    },
+    "S+N": {
+      "mean": 0.43549382716049384,
+      "std": 0.07676689736479268
+    },
+    "T+N": {
+      "mean": 0.5308641975308642,
+      "std": 0.09494441213746412
+    },
+    "S+T+N": {
+      "mean": 0.5339506172839507,
+      "std": 0.07820283616864153
+    }
+  },
+  "deltas": {
+    "Delta_S": -0.0306,
+    "Delta_T": 0.1136,
+    "Delta_N_ST": -0.0562
+  },
+  "collinearity": {
+    "all_pairs__T_vs_temporal_indegree": {
+      "pearson": 0.0756,
+      "spearman": 0.0845,
+      "n": 180
+    },
+    "all_pairs__T_vs_temporal_pagerank": {
+      "pearson": 0.074,
+      "spearman": -0.1463,
+      "n": 180
+    },
+    "positives__T_vs_temporal_indegree": {
+      "pearson": 0.0848,
+      "spearman": 0.0782,
+      "n": 90
+    },
+    "positives__T_vs_temporal_pagerank": {
+      "pearson": 0.0834,
+      "spearman": -0.1281,
+      "n": 90
+    },
+    "negatives__T_vs_temporal_indegree": {
+      "pearson": 0.0606,
+      "spearman": 0.1166,
+      "n": 90
+    },
+    "negatives__T_vs_temporal_pagerank": {
+      "pearson": 0.0584,
+      "spearman": -0.1574,
+      "n": 90
+    }
+  }
+}

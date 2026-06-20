@@ -1,0 +1,7 @@
+{
+  "all_features": 0.6445295906432749,
+  "without_temporal_indegree": 0.6422587134502924,
+  "without_citation_time_gap": 0.4790912280701754,
+  "without_temporal_pagerank": 0.6890547368421054,
+  "without_directional_similarity": 0.5935883040935673
+}

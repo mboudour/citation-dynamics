@@ -1,0 +1,72 @@
+{
+  "dataset": "additive_manufacturing",
+  "n_pairs": 162,
+  "n_positives": 81,
+  "auc": {
+    "S": {
+      "mean": 0.5204733455882353,
+      "std": 0.10212303933693764
+    },
+    "T": {
+      "mean": 0.6686580882352942,
+      "std": 0.04785925107931874
+    },
+    "N": {
+      "mean": 0.24738051470588235,
+      "std": 0.019283599701272212
+    },
+    "S+T": {
+      "mean": 0.6163143382352941,
+      "std": 0.059331455773534277
+    },
+    "S+N": {
+      "mean": 0.4866038602941177,
+      "std": 0.10838584517342978
+    },
+    "T+N": {
+      "mean": 0.5607766544117647,
+      "std": 0.10096994720358513
+    },
+    "S+T+N": {
+      "mean": 0.5937040441176471,
+      "std": 0.07888128748403139
+    }
+  },
+  "deltas": {
+    "Delta_S": -0.0523,
+    "Delta_T": 0.0958,
+    "Delta_N_ST": -0.0226
+  },
+  "collinearity": {
+    "all_pairs__T_vs_temporal_indegree": {
+      "pearson": 0.0688,
+      "spearman": 0.0867,
+      "n": 162
+    },
+    "all_pairs__T_vs_temporal_pagerank": {
+      "pearson": 0.0679,
+      "spearman": -0.2422,
+      "n": 162
+    },
+    "positives__T_vs_temporal_indegree": {
+      "pearson": 0.071,
+      "spearman": 0.0965,
+      "n": 81
+    },
+    "positives__T_vs_temporal_pagerank": {
+      "pearson": 0.0706,
+      "spearman": -0.1999,
+      "n": 81
+    },
+    "negatives__T_vs_temporal_indegree": {
+      "pearson": NaN,
+      "spearman": NaN,
+      "n": 81
+    },
+    "negatives__T_vs_temporal_pagerank": {
+      "pearson": -0.3101,
+      "spearman": -0.3213,
+      "n": 81
+    }
+  }
+}

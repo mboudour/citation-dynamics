@@ -1,0 +1,72 @@
+{
+  "dataset": "osteosarcoma",
+  "n_pairs": 502,
+  "n_positives": 251,
+  "auc": {
+    "S": {
+      "mean": 0.496236862745098,
+      "std": 0.04865357467802753
+    },
+    "T": {
+      "mean": 0.7141043137254901,
+      "std": 0.058696064019753406
+    },
+    "N": {
+      "mean": 0.2744125490196078,
+      "std": 0.013780405861142412
+    },
+    "S+T": {
+      "mean": 0.6702988235294117,
+      "std": 0.058876357266586174
+    },
+    "S+N": {
+      "mean": 0.4825121568627451,
+      "std": 0.07526424855260556
+    },
+    "T+N": {
+      "mean": 0.6558792156862745,
+      "std": 0.04030868232741803
+    },
+    "S+T+N": {
+      "mean": 0.6704360784313727,
+      "std": 0.056356281337008964
+    }
+  },
+  "deltas": {
+    "Delta_S": -0.0438,
+    "Delta_T": 0.1741,
+    "Delta_N_ST": 0.0001
+  },
+  "collinearity": {
+    "all_pairs__T_vs_temporal_indegree": {
+      "pearson": 0.2536,
+      "spearman": 0.1644,
+      "n": 502
+    },
+    "all_pairs__T_vs_temporal_pagerank": {
+      "pearson": 0.2536,
+      "spearman": 0.094,
+      "n": 502
+    },
+    "positives__T_vs_temporal_indegree": {
+      "pearson": 0.3668,
+      "spearman": 0.2399,
+      "n": 251
+    },
+    "positives__T_vs_temporal_pagerank": {
+      "pearson": 0.3669,
+      "spearman": 0.1524,
+      "n": 251
+    },
+    "negatives__T_vs_temporal_indegree": {
+      "pearson": NaN,
+      "spearman": NaN,
+      "n": 251
+    },
+    "negatives__T_vs_temporal_pagerank": {
+      "pearson": -0.006,
+      "spearman": 0.0349,
+      "n": 251
+    }
+  }
+}

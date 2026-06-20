@@ -1,0 +1,72 @@
+{
+  "dataset": "film_studies",
+  "n_pairs": 754,
+  "n_positives": 377,
+  "auc": {
+    "S": {
+      "mean": 0.5283499415204678,
+      "std": 0.02889078139881535
+    },
+    "T": {
+      "mean": 0.7033302923976608,
+      "std": 0.03661554448497233
+    },
+    "N": {
+      "mean": 0.26646877192982454,
+      "std": 0.0246960055710739
+    },
+    "S+T": {
+      "mean": 0.7023422222222222,
+      "std": 0.040402484110859276
+    },
+    "S+N": {
+      "mean": 0.5333069005847955,
+      "std": 0.049030038594447725
+    },
+    "T+N": {
+      "mean": 0.6240519298245614,
+      "std": 0.04049965283148244
+    },
+    "S+T+N": {
+      "mean": 0.683740350877193,
+      "std": 0.04337569120916915
+    }
+  },
+  "deltas": {
+    "Delta_S": -0.001,
+    "Delta_T": 0.174,
+    "Delta_N_ST": -0.0186
+  },
+  "collinearity": {
+    "all_pairs__T_vs_temporal_indegree": {
+      "pearson": 0.0509,
+      "spearman": 0.0744,
+      "n": 754
+    },
+    "all_pairs__T_vs_temporal_pagerank": {
+      "pearson": 0.0504,
+      "spearman": -0.2722,
+      "n": 754
+    },
+    "positives__T_vs_temporal_indegree": {
+      "pearson": 0.0703,
+      "spearman": 0.1119,
+      "n": 377
+    },
+    "positives__T_vs_temporal_pagerank": {
+      "pearson": 0.0699,
+      "spearman": -0.2815,
+      "n": 377
+    },
+    "negatives__T_vs_temporal_indegree": {
+      "pearson": NaN,
+      "spearman": NaN,
+      "n": 377
+    },
+    "negatives__T_vs_temporal_pagerank": {
+      "pearson": -0.2315,
+      "spearman": -0.28,
+      "n": 377
+    }
+  }
+}
