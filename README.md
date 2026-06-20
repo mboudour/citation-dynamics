@@ -15,23 +15,6 @@ The paper is available in `paper/manuscript4.pdf`.
 
 ---
 
-## Key Findings
-
-The S-T-N_prom decomposition reveals a consistent hierarchy across all ten corpora:
-
-| Finding | Result |
-|---|---|
-| Chronological distance (T) dominates | AUC(T) ranges from 0.577 to 0.824; ΔT > 0 in all ten corpora |
-| Semantic alignment (S) adds little beyond T | ΔS < 0 in **all ten corpora** — adding S to a model that already includes T *reduces* AUC |
-| In four of ten corpora, cited papers are marginally *less* semantically aligned than non-cited candidates | Consistent with keyword-defined corpora compressing semantic variation |
-| Citation-network prominence (N_prom) contributes negligibly once T is known | ΔN\|ST ≈ 0 in eight of ten corpora |
-| When citations occur despite weak semantic alignment, they are temporally proximate | ΔT < 0 for the lowest-similarity decile in nine of ten corpora |
-| The dominance of T is not universal | Income Inequality is the one corpus where N_prom is the primary separator (d_Nprom = 0.366, d_T = 0.087) |
-
-The full S-T-N_prom decomposition results are in `outputs/results/stn_decomposition_summary.csv`.
-
----
-
 ## Datasets
 
 Ten thematic bibliographic datasets are retrieved from Dimensions.ai using keyword searches in title and abstract, restricted to journal articles published 1975–2024.
@@ -39,18 +22,18 @@ Ten thematic bibliographic datasets are retrieved from Dimensions.ai using keywo
 
 **Table 1. Corpus construction overview**
 
-| Domain | Dataset | Keywords | Year range | Papers | Total unique citations | Mean ref length |
-|---|---|---|---|---|---|---|
-| Science | Protein Folding | "protein folding" | 1975–2024 | 82,428 | 1,161,663 | 47.1 |
-| Science | CRISPR | "CRISPR" | 2002–2024 | 64,484 | 1,138,453 | 45.5 |
-| Engineering | Additive Manufacturing | "additive manufacturing" | 1975–2024 | 58,541 | 816,148 | 40.0 |
-| Engineering | Corrosion Protection | "corrosion protection" | 1975–2024 | 26,486 | 323,246 | 29.3 |
-| BioMed | Neuroblastoma | "neuroblastoma" | 1975–2024 | 57,319 | 775,233 | 28.7 |
-| BioMed | Osteosarcoma | "osteosarcoma" OR "bone sarcoma" | 1975–2024 | 61,187 | 649,724 | 24.3 |
-| Social Science | Income Inequality | "income inequality" | 1975–2024 | 40,279 | 487,905 | 26.1 |
-| Social Science | Organizational Behavior | "organizational behavior" | 1975–2024 | 75,622 | 856,527 | 29.0 |
-| Humanities | Film Studies | "film studies" | 1975–2024 | 393,342 | 3,866,640 | 26.0 |
-| Humanities | Memory Studies | "memory studies" | 1975–2024 | 347,195 | 4,047,258 | 35.9 |
+| Domain | Dataset | Keywords | Year range | Papers | Total unique citations | Mean ref length | Papers with abstracts |
+|---|---|---|---|---|---|---|---|
+| Science | Protein Folding | "protein folding" | 1975–2024 | 82,428 | 1,161,663 | 47.1 | 82,428 (100.0%) |
+| Science | CRISPR | "CRISPR" | 2002–2024 | 64,484 | 1,138,453 | 45.5 | 64,484 (100.0%) |
+| Engineering | Additive Manufacturing | "additive manufacturing" | 1975–2024 | 58,541 | 816,148 | 40.0 | 58,541 (100.0%) |
+| Engineering | Corrosion Protection | "corrosion protection" | 1975–2024 | 26,486 | 323,246 | 29.3 | 26,486 (100.0%) |
+| BioMed | Neuroblastoma | "neuroblastoma" | 1975–2024 | 57,319 | 775,233 | 28.7 | 57,319 (100.0%) |
+| BioMed | Osteosarcoma | "osteosarcoma" OR "bone sarcoma" | 1975–2024 | 61,187 | 649,724 | 24.3 | 61,187 (100.0%) |
+| Social Science | Income Inequality | "income inequality" | 1975–2024 | 40,279 | 487,905 | 26.1 | 40,279 (100.0%) |
+| Social Science | Organizational Behavior | "organizational behavior" | 1975–2024 | 75,622 | 856,527 | 29.0 | 75,622 (100.0%) |
+| Humanities | Film Studies | "film studies" | 1975–2024 | 393,342 | 3,866,640 | 26.0 | 393,342 (100.0%) |
+| Humanities | Memory Studies | "memory studies" | 1975–2024 | 347,195 | 4,047,258 | 35.9 | 347,195 (100.0%) |
 
 **Table 2. Citation graph statistics**
 
@@ -114,6 +97,24 @@ matplotlib>=3.7
 seaborn>=0.12
 tabulate>=0.9
 ```
+
+---
+
+## Key Findings
+
+The central contribution of this study is the S-T-N_prom decomposition of citation formation, applied consistently across ten keyword-defined scholarly corpora. The decomposition isolates the marginal predictive contribution of each component — directional semantic alignment (S), chronological distance (T), and citation-network prominence (N_prom) — under temporally rigorous evaluation conditions that eliminate future-topology data leakage.
+
+**Chronological distance dominates across all corpora.** The T-only model achieves AUC scores ranging from 0.577 (Memory Studies) to 0.824 (Protein Folding), substantially outperforming both S-only and N_prom-only models in every corpus. The marginal contribution of T beyond S (ΔT) is positive in all ten corpora, confirming that chronological distance carries discriminative information that semantic alignment cannot provide. This finding is consistent with the Matthew effect and preferential attachment dynamics in citation networks: papers that have been in the literature longer have accumulated more citations and are therefore more likely to be cited again, independently of their semantic content.
+
+**Semantic alignment adds little beyond chronological distance — and in most corpora actively reduces predictive power.** ΔS < 0 in all ten corpora, meaning that adding directional semantic alignment to a model that already includes T reduces rather than improves AUC. This result does not imply that semantic content is irrelevant to citation formation in general; rather, within keyword-defined corpora where the candidate-generation protocol already restricts both topical and chronological distance variation, semantic alignment contributes little additional predictive information beyond what chronological distance already captures. Notably, in four of ten corpora, cited papers are marginally *less* semantically aligned with the citing paper than non-cited candidates — a result unusual in the citation prediction literature, and most plausibly arising because keyword-defined corpora compress semantic variation among candidate papers, reducing the discriminative value of semantic alignment below chance.
+
+**Citation-network prominence contributes negligibly once chronological distance is known.** ΔN|ST ≈ 0 in eight of ten corpora, indicating that temporal indegree and PageRank provide no independent predictive signal beyond T. This is itself a network-scientific finding: within temporally and topically constrained candidate pools, citation-network prominence is largely a proxy for chronological position rather than an independent structural signal. The two exceptions — Income Inequality and Organizational Behavior — exhibit non-trivial Cohen's d for N_prom (0.366 and 0.342 respectively), yet ΔN|ST remains near zero, revealing a collinearity paradox in which prominence separates cited from non-cited candidates in isolation but adds nothing once T is already in the model.
+
+**When citations occur despite weak semantic alignment, they are temporally proximate.** In nine of ten corpora, the lowest-similarity decile of citation pairs is more temporally recent than the average positive pair (ΔT < 0), suggesting that chronological recency compensates for semantic distance. No consistent prominence pattern emerges among semantically surprising citations across corpora.
+
+**The Income Inequality corpus is the notable exception.** It is the one corpus where the T curve is completely flat (d_T = 0.087) and N_prom is the primary separator (d_Nprom = 0.366), demonstrating that chronological distance dominance is not a universal law but a corpus-specific profile that varies with the citation culture of each scholarly community.
+
+All conclusions are conditional on the keyword-defined corpus design and the ±3-year hard-negative candidate space employed in this study. The full S-T-N_prom decomposition results are in `outputs/results/stn_decomposition_summary.csv`.
 
 ---
 
