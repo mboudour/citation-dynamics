@@ -24,16 +24,16 @@ Ten thematic bibliographic datasets are retrieved from Dimensions.ai using keywo
 
 | Domain | Dataset | Keywords | Year range | Papers | Total unique citations | Mean ref length | Papers with abstracts |
 |---|---|---|---|---|---|---|---|
-| Science | Protein Folding | "protein folding" | 1975–2024 | 82,428 | 1,161,663 | 47.1 | 82,428 (100.0%) |
-| Science | CRISPR | "CRISPR" | 2002–2024 | 64,484 | 1,138,453 | 45.5 | 64,484 (100.0%) |
-| Engineering | Additive Manufacturing | "additive manufacturing" | 1975–2024 | 58,541 | 816,148 | 40.0 | 58,541 (100.0%) |
-| Engineering | Corrosion Protection | "corrosion protection" | 1975–2024 | 26,486 | 323,246 | 29.3 | 26,486 (100.0%) |
-| BioMed | Neuroblastoma | "neuroblastoma" | 1975–2024 | 57,319 | 775,233 | 28.7 | 57,319 (100.0%) |
-| BioMed | Osteosarcoma | "osteosarcoma" OR "bone sarcoma" | 1975–2024 | 61,187 | 649,724 | 24.3 | 61,187 (100.0%) |
-| Social Science | Income Inequality | "income inequality" | 1975–2024 | 40,279 | 487,905 | 26.1 | 40,279 (100.0%) |
-| Social Science | Organizational Behavior | "organizational behavior" | 1975–2024 | 75,622 | 856,527 | 29.0 | 75,622 (100.0%) |
-| Humanities | Film Studies | "film studies" | 1975–2024 | 393,342 | 3,866,640 | 26.0 | 393,342 (100.0%) |
-| Humanities | Memory Studies | "memory studies" | 1975–2024 | 347,195 | 4,047,258 | 35.9 | 347,195 (100.0%) |
+| Science | Protein Folding | "protein folding" | 1975–2024 | 82,428 | 1,161,663 | 47.1 | 79,455 (96.4%) |
+| Science | CRISPR | "CRISPR" | 2002–2024 | 64,484 | 1,138,453 | 45.5 | 60,316 (93.5%) |
+| Engineering | Additive Manufacturing | "additive manufacturing" | 1975–2024 | 58,541 | 816,148 | 40.0 | 56,901 (97.2%) |
+| Engineering | Corrosion Protection | "corrosion protection" | 1975–2024 | 26,486 | 323,246 | 29.3 | 25,432 (96.0%) |
+| BioMed | Neuroblastoma | "neuroblastoma" | 1975–2024 | 57,319 | 775,233 | 28.7 | 51,616 (90.1%) |
+| BioMed | Osteosarcoma | "osteosarcoma" OR "bone sarcoma" | 1975–2024 | 61,187 | 649,724 | 24.3 | 54,528 (89.1%) |
+| Social Science | Income Inequality | "income inequality" | 1975–2024 | 40,279 | 487,905 | 26.1 | 38,666 (96.0%) |
+| Social Science | Organizational Behavior | "organizational behavior" | 1975–2024 | 75,622 | 856,527 | 29.0 | 68,985 (91.2%) |
+| Humanities | Film Studies | "film studies" | 1975–2024 | 393,342 | 3,866,640 | 26.0 | 387,458 (98.5%) |
+| Humanities | Memory Studies | "memory studies" | 1975–2024 | 347,195 | 4,047,258 | 35.9 | 343,757 (99.0%) |
 
 **Table 2. Citation graph statistics**
 
